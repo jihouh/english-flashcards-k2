@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Small Steps Spelling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --bg: #F7FFF7;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            touch-action: manipulation;
+            overflow-x: hidden;
+        }
+
+        nav {
+            background: var(--primary);
+            width: 100%;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: white;
+            font-weight: bold;
+            font-family: 'Comic Neue', cursive;
+            text-transform: lowercase;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: var(--accent);
+            font-size: 0.8rem;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .screen { display: none; animation: fadeIn 0.3s; }
+        .active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card-img {
+            width: 80%;
+            max-width: 250px;
+            aspect-ratio: 1/1;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 6px solid white;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .big-word {
+            font-size: clamp(3rem, 15vw, 5rem);
+            color: var(--primary);
+            text-transform: lowercase;
+            margin: 15px 0;
+            letter-spacing: 4px;
+        }
+
+        .slot {
+            width: 35px;
+            height: 45px;
+            border-bottom: 4px solid var(--secondary);
+            display: inline-block;
+            margin: 0 5px;
+            font-size: 2rem;
+            color: var(--primary);
+            text-transform: lowercase;
+            line-height: 45px;
+        }
+
+        .letter-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.6rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            margin: 4px;
+            text-transform: lowercase;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .lib-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-transform: lowercase;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ fullscreen</button>
+
+<nav>
+    <button onclick="showScreen('learn')">📖 learn</button>
+    <button onclick="showScreen('match')">🧩 match</button>
+    <button onclick="showScreen('spell')">✏️ spell</button>
+    <button onclick="showScreen('library')">📚 library</button>
+</nav>
+
+<div class="container">
+    <div id="learn" class="screen active">
+        <img id="learn-img" class="card-img" src="">
+        <div id="learn-word" class="big-word" onclick="handleLearnClick()">word</div>
+        <div class="nav-controls">
+            <button onclick="prevItem('learn')">⬅ back</button>
+            <button onclick="nextItem('learn')">next ➔</button>
+        </div>
+    </div>
+
+    <div id="match" class="screen">
+        <h3>find the word!</h3>
+        <img id="match-img" class="card-img" src="">
+        <div id="match-options" style="margin-top:20px;"></div>
+    </div>
+
+    <div id="spell" class="screen">
+        <img id="spell-img" class="card-img" src="">
+        <div id="spell-slots" style="margin: 20px 0;"></div>
+        <div id="letter-pool"></div>
+        <div class="nav-controls">
+            <button onclick="prevItem('spell')">⬅ back</button>
+            <button onclick="resetSpell()" style="background: #eee;">restart</button>
+            <button onclick="nextItem('spell')">next ➔</button>
+        </div>
+    </div>
+
+    <div id="library" class="screen">
+        <h3>word bank</h3>
+        <div id="library-grid" class="grid"></div>
+    </div>
+</div>
+
+<script>
+    const wordList = [
+        { word: 'school', img: 'https://img.freepik.com/premium-vector/children-playing-school_1308-20630.jpg?semt=ais_hybrid&w=350' },
+        { word: 'pupil', img: 'https://img.freepik.com/free-vector/hand-drawn-children-back-school_52683-41026.jpg?semt=ais_hybrid&w=350' },
+        { word: 'study', img: 'https://img.freepik.com/premium-vector/childrens-learning-entertaining-cartoon-character-vector-illustration-education-media_1317464-46602.jpg?semt=ais_hybrid&w=400' },
+        { word: 'book', img: 'https://img.freepik.com/premium-vector/book-cartoon_642458-2444.jpg?semt=ais_hybrid&w=400' },
+        { word: 'pencil', img: 'https://img.freepik.com/free-psd/flat-design-pencil-illustration_23-2151383608.jpg?semt=ais_hybrid&w=300' },
+        { word: 'home', img: 'https://img.freepik.com/free-vector/design-young-family-home_23-2147910110.jpg?semt=ais_hybrid&w=350' },
+        { word: 'house', img: 'https://img.freepik.com/premium-vector/icon-vector-house-home-estate-illustration-building-architecture-residential-property-symb_1013341-33626.jpg?semt=ais_hybrid&w=400' },
+        { word: 'toilet', img: 'https://img.freepik.com/premium-vector/interior-toilet-room-with-sink-mirror-toilet-vector-illustration_263366-605.jpg?semt=ais_hybrid&w=400' },
+        { word: 'table', img: 'https://img.freepik.com/premium-vector/table-illustration-7_567804-1477.jpg?semt=ais_hybrid&w=300' },
+        { word: 'chair', img: 'https://img.freepik.com/premium-vector/modern-isolated-chair-vector-illustration-with-sleek-minimalist-design_972076-2156.jpg?semt=ais_hybrid&w=400' }
+    ];
+
+    let currentIdx = 0;
+    let spellIdx = 0;
+    let spellInput = "";
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(e => console.log(e));
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.speechSynthesis.cancel();
+        if(id === 'learn') renderLearn();
+        if(id === 'match') nextMatch();
+        if(id === 'spell') renderSpell();
+        if(id === 'library') loadLibrary();
+    }
+
+    function speak(text, rate = 1.0) {
+        const msg = new SpeechSynthesisUtterance(text.toLowerCase());
+        msg.rate = rate;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function playDing() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    // NAVIGATION HELPERS
+    function nextItem(module) {
+        if(module === 'learn') {
+            currentIdx = (currentIdx + 1) % wordList.length;
+            renderLearn();
+        } else if (module === 'spell') {
+            spellIdx = (spellIdx + 1) % wordList.length;
+            renderSpell();
+        }
+    }
+
+    function prevItem(module) {
+        if(module === 'learn') {
+            currentIdx = (currentIdx - 1 + wordList.length) % wordList.length;
+            renderLearn();
+        } else if (module === 'spell') {
+            spellIdx = (spellIdx - 1 + wordList.length) % wordList.length;
+            renderSpell();
+        }
+    }
+
+    // LEARN
+    function renderLearn() {
+        const item = wordList[currentIdx];
+        document.getElementById('learn-img').src = item.img;
+        document.getElementById('learn-word').innerText = item.word;
+    }
+
+    async function handleLearnClick() {
+        window.speechSynthesis.cancel();
+        const word = wordList[currentIdx].word;
+        speak(word);
+        await new Promise(r => setTimeout(r, 1200)); 
+        for (let char of word) {
+            speak(char, 0.8);
+            await new Promise(r => setTimeout(r, 1000)); 
+        }
+        speak(word);
+    }
+
+    // MATCH
+    function nextMatch() {
+        const correct = wordList[Math.floor(Math.random() * wordList.length)];
+        document.getElementById('match-img').src = correct.img;
+        let options = [...wordList].sort(() => 0.5 - Math.random()).slice(0, 3);
+        if(!options.find(o => o.word === correct.word)) options[0] = correct;
+        options.sort(() => 0.5 - Math.random());
+
+        const container = document.getElementById('match-options');
+        container.innerHTML = '';
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.style.width = 'auto';
+            btn.style.padding = '10px 20px';
+            btn.innerText = opt.word;
+            btn.onclick = () => {
+                if(opt.word === correct.word) {
+                    playDing();
+                    speak(opt.word);
+                    setTimeout(nextMatch, 1500);
+                } else {
+                    speak("no", 1.2);
+                }
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    // SPELL
+    function renderSpell() {
+        const item = wordList[spellIdx];
+        document.getElementById('spell-img').src = item.img;
+        resetSpell();
+    }
+
+    function resetSpell() {
+        spellInput = "";
+        const currentWord = wordList[spellIdx].word;
+        document.getElementById('spell-slots').innerHTML = currentWord.split('').map(() => `<div class="slot"></div>`).join('');
+        const pool = document.getElementById('letter-pool');
+        pool.innerHTML = '';
+        currentWord.split('').sort(() => 0.5 - Math.random()).forEach(l => {
+            const btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = l;
+            btn.onclick = () => {
+                if(spellInput.length < currentWord.length) {
+                    const currentSlots = document.querySelectorAll('.slot');
+                    currentSlots[spellInput.length].innerText = l;
+                    spellInput += l;
+                    speak(l, 1.3); // Speed up spelling voice
+                    
+                    if(spellInput === currentWord) {
+                        playDing();
+                        setTimeout(() => speak("well done, " + currentWord), 300);
+                        setTimeout(() => nextItem('spell'), 2500);
+                    } else if (spellInput.length === currentWord.length) {
+                        speak("try again", 1.2);
+                        setTimeout(resetSpell, 1000);
+                    }
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    // LIBRARY
+    function loadLibrary() {
+        const grid = document.getElementById('library-grid');
+        grid.innerHTML = '';
+        wordList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'lib-item';
+            div.innerText = item.word;
+            div.onclick = () => speak(item.word);
+            grid.appendChild(div);
+        });
+    }
+
+    renderLearn();
+</script>
+</body>
+</html>
