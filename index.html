@@ -278,7 +278,6 @@
         { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false }
     ];
 
-    // Shuffling separate lists for each mode so they are independent
     let learnList = [...wordList].sort(() => 0.5 - Math.random());
     let matchList = [...wordList].sort(() => 0.5 - Math.random());
     let spellList = [...wordList].sort(() => 0.5 - Math.random());
@@ -328,7 +327,6 @@
             item.earned = true;
             updateStickerBar();
             playDing();
-            speak("New sticker!", 1.2);
         } else if (item && item.earned) {
             playDing();
         }
@@ -351,7 +349,6 @@
         window.speechSynthesis.speak(msg);
     }
 
-    // LEARN MODULE
     function renderLearn() {
         const item = learnList[learnIdx];
         document.getElementById('learn-img').src = item.img;
@@ -369,7 +366,6 @@
         speak(word);
     }
 
-    // MATCH MODULE
     function renderMatch() {
         const correct = matchList[matchIdx];
         document.getElementById('match-img').src = correct.img;
@@ -384,6 +380,7 @@
             btn.onclick = () => {
                 if(opt.word === correct.word) {
                     earnSticker(correct.word);
+                    speak(correct.word);
                     setTimeout(() => nextItem('match'), 1200);
                 } else { speak("no", 1.2); }
             };
@@ -391,7 +388,6 @@
         });
     }
 
-    // SPELLING MODULE
     function renderSpell() {
         const item = spellList[spellIdx];
         document.getElementById('spell-img').src = item.img;
@@ -416,6 +412,7 @@
                     speak(l, 1.3);
                     if(spellInput === currentWord) {
                         earnSticker(currentWord);
+                        speak(currentWord);
                         setTimeout(() => nextItem('spell'), 1800);
                     }
                 }
