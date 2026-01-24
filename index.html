@@ -13,6 +13,7 @@
             --bg: #F7FFF7;
             --gray: #888;
             --light-gray: #e0e0e0;
+            --delete: #ff9f43;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,11 +31,10 @@
             user-select: none;
         }
 
-        /* Top Bar - Center cluster of buttons */
         nav {
             background: var(--primary);
             width: 100%;
-            padding: env(safe-area-inset-top) 5px 10px 5px;
+            padding: calc(env(safe-area-inset-top) + 10px) 10px 10px 10px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
@@ -44,7 +44,7 @@
 
         nav button {
             padding: 8px 5px;
-            width: 70px; /* Slightly smaller to fit 5 buttons on mobile */
+            width: 70px;
             font-size: 12px;
             border: none;
             border-radius: 8px;
@@ -55,7 +55,6 @@
             cursor: pointer;
         }
 
-        /* Sticker Bar - Visual Progress */
         .sticker-bar {
             background: white;
             width: 100%;
@@ -74,8 +73,9 @@
             background: #f9f9f9;
             border: 1px dashed #ccc;
             background-size: cover;
+            background-position: center;
             flex-shrink: 0;
-            transition: all 0.5s ease;
+            transition: transform 0.3s ease;
         }
 
         .sticker-slot.earned {
@@ -88,7 +88,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
+            padding: 20px;
             overflow-y: auto;
             margin-top: 10px;
         }
@@ -112,15 +112,15 @@
             color: var(--primary);
             margin: 15px 0;
             letter-spacing: 4px;
+            cursor: pointer;
         }
 
-        /* Minimalist Controls */
         .nav-controls {
             width: 100%;
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 25px;
+            margin-top: 30px;
         }
 
         .nav-controls button {
@@ -129,13 +129,14 @@
             color: var(--gray);
             padding: 10px;
             border-radius: 20px;
-            font-size: 14px;
-            width: 90px;
+            font-size: 15px;
+            width: 100px;
+            cursor: pointer;
         }
 
         .slot {
-            width: 35px;
-            height: 45px;
+            width: clamp(28px, 6vw, 45px);
+            height: 50px;
             border-bottom: 3px solid var(--light-gray);
             display: inline-block;
             margin: 0 4px;
@@ -145,30 +146,44 @@
         }
 
         .letter-btn {
-            width: 60px; height: 60px;
+            width: 65px; height: 65px;
             background: var(--accent);
             border: none;
             border-radius: 12px;
             box-shadow: 0 3px 0px #e6cc52;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-family: 'Comic Neue', cursive;
+            cursor: pointer;
         }
 
-        /* Library vs Sticker Book Grid */
+        .backspace-btn {
+            width: 65px; height: 65px;
+            background: var(--delete);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 3px 0px #d38334;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .letter-btn:active, .backspace-btn:active { transform: translateY(2px); box-shadow: none; }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
             width: 100%;
         }
 
         .lib-item {
             background: white;
-            padding: 15px 5px;
+            padding: 15px;
             border-radius: 10px;
             border: 1px solid var(--light-gray);
             text-align: center;
-            font-size: 14px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .sticker-page-item {
@@ -181,7 +196,6 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
-            transition: 0.3s;
         }
 
         .locked { opacity: 0.2; filter: grayscale(1); }
@@ -222,7 +236,10 @@
     <div id="spell" class="screen">
         <img id="spell-img" class="card-img" src="">
         <div id="spell-slots" style="margin: 20px 0;"></div>
-        <div id="letter-pool" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"></div>
+        <div id="letter-pool-container" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; align-items: center;">
+            <div id="letter-pool" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"></div>
+            <button id="backspace" class="backspace-btn" onclick="handleBackspace()">⌫</button>
+        </div>
         <div class="nav-controls">
             <button onclick="prevItem('spell')">back</button>
             <button onclick="resetSpell()">restart</button>
@@ -238,16 +255,17 @@
     <div id="book" class="screen">
         <h2 style="font-weight: 400; color: var(--gray); font-size: 18px;">my stickers</h2>
         <div id="book-grid" class="grid"></div>
+        <button onclick="clearProgress()" style="margin-top:30px; background:none; border:none; color:#ccc; text-decoration:underline; font-size:12px;">reset progress</button>
     </div>
 </div>
 
 <script>
-    const wordList = [
-//        { word: 'school', img: 'https://img.freepik.com/premium-vector/children-playing-school_1308-20630.jpg?w=350', earned: false },
-//        { word: 'pupil', img: 'https://img.freepik.com/free-vector/hand-drawn-children-back-school_52683-41026.jpg?w=350', earned: false },
-//        { word: 'study', img: 'https://img.freepik.com/premium-vector/childrens-learning-entertaining-cartoon-character-vector-illustration-education-media_1317464-46602.jpg?w=400', earned: false },
-//        { word: 'book', img: 'https://img.freepik.com/premium-vector/book-cartoon_642458-2444.jpg?w=400', earned: false },
-//        { word: 'pencil', img: 'https://img.freepik.com/free-psd/flat-design-pencil-illustration_23-2151383608.jpg?w=300', earned: false },
+    let wordList = [
+        { word: 'school', img: 'https://img.freepik.com/premium-vector/children-playing-school_1308-20630.jpg?w=350', earned: false },
+        { word: 'pupil', img: 'https://img.freepik.com/free-vector/hand-drawn-children-back-school_52683-41026.jpg?w=350', earned: false },
+        { word: 'study', img: 'https://img.freepik.com/premium-vector/childrens-learning-entertaining-cartoon-character-vector-illustration-education-media_1317464-46602.jpg?w=400', earned: false },
+        { word: 'book', img: 'https://img.freepik.com/premium-vector/book-cartoon_642458-2444.jpg?w=400', earned: false },
+        { word: 'pencil', img: 'https://img.freepik.com/free-psd/flat-design-pencil-illustration_23-2151383608.jpg?w=300', earned: false },
         { word: 'home', img: 'https://img.freepik.com/free-vector/design-young-family-home_23-2147910110.jpg?w=350', earned: false },
         { word: 'house', img: 'https://img.freepik.com/premium-vector/icon-vector-house-home-estate-illustration-building-architecture-residential-property-symb_1013341-33626.jpg?w=400', earned: false },
         { word: 'toilet', img: 'https://img.freepik.com/premium-vector/interior-toilet-room-with-sink-mirror-toilet-vector-illustration_263366-605.jpg?w=400', earned: false },
@@ -260,13 +278,44 @@
         { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false }
     ];
 
-    let currentIdx = 0;
+    // Shuffling separate lists for each mode so they are independent
+    let learnList = [...wordList].sort(() => 0.5 - Math.random());
+    let matchList = [...wordList].sort(() => 0.5 - Math.random());
+    let spellList = [...wordList].sort(() => 0.5 - Math.random());
+
+    let learnIdx = 0;
+    let matchIdx = 0;
     let spellIdx = 0;
     let spellInput = "";
 
+    function playDing() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+
+        osc1.connect(gain1); gain1.connect(audioCtx.destination);
+        osc2.connect(gain2); gain2.connect(audioCtx.destination);
+
+        osc1.type = 'sine'; osc1.frequency.setValueAtTime(1046.50, audioCtx.currentTime); 
+        osc2.type = 'sine'; osc2.frequency.setValueAtTime(1318.51, audioCtx.currentTime);
+
+        gain1.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain1.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
+        gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+        gain2.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain2.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
+        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+
+        osc1.start(); osc2.start();
+        osc1.stop(audioCtx.currentTime + 1.2); osc2.stop(audioCtx.currentTime + 1.2);
+    }
+
     function updateStickerBar() {
         const bar = document.getElementById('sticker-bar');
-        bar.innerHTML = wordList.map((w, i) => `
+        bar.innerHTML = wordList.map(w => `
             <div class="sticker-slot ${w.earned ? 'earned' : ''}" 
                  style="${w.earned ? 'background-image:url('+w.img+')' : ''}">
             </div>
@@ -278,7 +327,10 @@
         if (item && !item.earned) {
             item.earned = true;
             updateStickerBar();
-            speak("You got a sticker!", 1.2);
+            playDing();
+            speak("New sticker!", 1.2);
+        } else if (item && item.earned) {
+            playDing();
         }
     }
 
@@ -299,15 +351,15 @@
         window.speechSynthesis.speak(msg);
     }
 
-    // LEARN
+    // LEARN MODULE
     function renderLearn() {
-        const item = wordList[currentIdx];
+        const item = learnList[learnIdx];
         document.getElementById('learn-img').src = item.img;
         document.getElementById('learn-word').innerText = item.word;
     }
 
     async function handleLearnClick() {
-        const word = wordList[currentIdx].word;
+        const word = learnList[learnIdx].word;
         speak(word);
         await new Promise(r => setTimeout(r, 1200)); 
         for (let char of word) {
@@ -317,9 +369,9 @@
         speak(word);
     }
 
-    // MATCH
+    // MATCH MODULE
     function renderMatch() {
-        const correct = wordList[currentIdx];
+        const correct = matchList[matchIdx];
         document.getElementById('match-img').src = correct.img;
         let options = [...wordList].sort(() => 0.5 - Math.random()).slice(0, 3);
         if(!options.find(o => o.word === correct.word)) options[0] = correct;
@@ -332,7 +384,6 @@
             btn.onclick = () => {
                 if(opt.word === correct.word) {
                     earnSticker(correct.word);
-                    speak(correct.word);
                     setTimeout(() => nextItem('match'), 1200);
                 } else { speak("no", 1.2); }
             };
@@ -340,16 +391,16 @@
         });
     }
 
-    // SPELL
+    // SPELLING MODULE
     function renderSpell() {
-        const item = wordList[spellIdx];
+        const item = spellList[spellIdx];
         document.getElementById('spell-img').src = item.img;
         resetSpell();
     }
 
     function resetSpell() {
         spellInput = "";
-        const currentWord = wordList[spellIdx].word;
+        const currentWord = spellList[spellIdx].word;
         document.getElementById('spell-slots').innerHTML = currentWord.split('').map(() => `<div class="slot"></div>`).join('');
         const pool = document.getElementById('letter-pool');
         pool.innerHTML = '';
@@ -358,15 +409,14 @@
             btn.className = 'letter-btn';
             btn.innerText = l;
             btn.onclick = () => {
+                const slots = document.querySelectorAll('.slot');
                 if(spellInput.length < currentWord.length) {
-                    const slots = document.querySelectorAll('.slot');
                     slots[spellInput.length].innerText = l;
                     spellInput += l;
                     speak(l, 1.3);
                     if(spellInput === currentWord) {
                         earnSticker(currentWord);
-                        setTimeout(() => speak("Well done!"), 500);
-                        setTimeout(() => nextItem('spell'), 2000);
+                        setTimeout(() => nextItem('spell'), 1800);
                     }
                 }
             };
@@ -374,7 +424,15 @@
         });
     }
 
-    // LIBRARY (List of all words)
+    function handleBackspace() {
+        if (spellInput.length > 0) {
+            const slots = document.querySelectorAll('.slot');
+            spellInput = spellInput.slice(0, -1);
+            slots[spellInput.length].innerText = "";
+            speak("back", 1.5);
+        }
+    }
+
     function renderLibrary() {
         const grid = document.getElementById('library-grid');
         grid.innerHTML = wordList.map(w => `
@@ -382,7 +440,6 @@
         `).join('');
     }
 
-    // STICKER BOOK (Earned items)
     function renderStickerBook() {
         const grid = document.getElementById('book-grid');
         grid.innerHTML = wordList.map(w => `
@@ -393,14 +450,24 @@
         `).join('');
     }
 
+    function clearProgress() {
+        if(confirm("Start over?")) {
+            wordList.forEach(w => w.earned = false);
+            updateStickerBar();
+            if(document.getElementById('book').classList.contains('active')) renderStickerBook();
+        }
+    }
+
     function nextItem(m) { 
-        if(m==='spell') { spellIdx=(spellIdx+1)%wordList.length; renderSpell(); }
-        else { currentIdx=(currentIdx+1)%wordList.length; m==='learn'?renderLearn():renderMatch(); }
+        if(m==='learn') { learnIdx=(learnIdx+1)%learnList.length; renderLearn(); }
+        if(m==='match') { matchIdx=(matchIdx+1)%matchList.length; renderMatch(); }
+        if(m==='spell') { spellIdx=(spellIdx+1)%spellList.length; renderSpell(); }
     }
     
     function prevItem(m) { 
-        if(m==='spell') { spellIdx=(spellIdx-1+wordList.length)%wordList.length; renderSpell(); }
-        else { currentIdx=(currentIdx-1+wordList.length)%wordList.length; m==='learn'?renderLearn():renderMatch(); }
+        if(m==='learn') { learnIdx=(learnIdx-1+learnList.length)%learnList.length; renderLearn(); }
+        if(m==='match') { matchIdx=(matchIdx-1+matchList.length)%matchList.length; renderMatch(); }
+        if(m==='spell') { spellIdx=(spellIdx-1+spellList.length)%spellList.length; renderSpell(); }
     }
 
     updateStickerBar();
