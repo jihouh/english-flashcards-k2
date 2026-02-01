@@ -184,6 +184,7 @@
             text-align: center;
             font-size: 16px;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
         .sticker-page-item {
@@ -196,6 +197,39 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
+        }
+
+        /* Popup Styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .popup-card {
+            background: var(--bg);
+            padding: 30px;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
         }
 
         .locked { opacity: 0.2; filter: grayscale(1); }
@@ -213,6 +247,15 @@
 </nav>
 
 <div id="sticker-bar" class="sticker-bar"></div>
+
+<div id="lib-popup" class="overlay">
+    <div class="popup-card">
+        <button class="close-btn" onclick="closeLibPopup()">✖</button>
+        <img id="popup-img" class="card-img" src="" style="max-height: 200px; margin-bottom: 15px;">
+        <div id="popup-word" class="big-word">word</div>
+        <button id="replay-btn" class="letter-btn" style="width: auto; padding: 0 20px; height: 50px; font-size: 1rem;">🔊 replay</button>
+    </div>
+</div>
 
 <div class="container">
     <div id="learn" class="screen active">
@@ -248,7 +291,7 @@
     </div>
 
     <div id="library" class="screen">
-        <h2 style="font-weight: 400; color: var(--gray); font-size: 18px;">word library</h2>
+        <h2 style="font-weight: 400; color: var(--gray); font-size: 18px;">word library (hold to peek)</h2>
         <div id="library-grid" class="grid"></div>
     </div>
 
@@ -261,21 +304,27 @@
 
 <script>
     let wordList = [
-//        { word: 'school', img: 'https://img.freepik.com/premium-vector/children-playing-school_1308-20630.jpg?w=350', earned: false },
-//        { word: 'pupil', img: 'https://img.freepik.com/free-vector/hand-drawn-children-back-school_52683-41026.jpg?w=350', earned: false },
-//        { word: 'study', img: 'https://img.freepik.com/premium-vector/childrens-learning-entertaining-cartoon-character-vector-illustration-education-media_1317464-46602.jpg?w=400', earned: false },
-//        { word: 'book', img: 'https://img.freepik.com/premium-vector/book-cartoon_642458-2444.jpg?w=400', earned: false },
-//        { word: 'pencil', img: 'https://img.freepik.com/free-psd/flat-design-pencil-illustration_23-2151383608.jpg?w=300', earned: false },
-//        { word: 'home', img: 'https://img.freepik.com/free-vector/design-young-family-home_23-2147910110.jpg?w=350', earned: false },
-//        { word: 'house', img: 'https://img.freepik.com/premium-vector/icon-vector-house-home-estate-illustration-building-architecture-residential-property-symb_1013341-33626.jpg?w=400', earned: false },
-//        { word: 'toilet', img: 'https://img.freepik.com/premium-vector/interior-toilet-room-with-sink-mirror-toilet-vector-illustration_263366-605.jpg?w=400', earned: false },
-//        { word: 'table', img: 'https://img.freepik.com/premium-vector/table-illustration-7_567804-1477.jpg?w=300', earned: false },
-//        { word: 'chair', img: 'https://img.freepik.com/premium-vector/modern-isolated-chair-vector-illustration-with-sleek-minimalist-design_972076-2156.jpg?w=400', earned: false },
         { word: 'cake', img: 'https://img.freepik.com/premium-vector/delicious-cake-clipart-vector-art-illustration_761413-18518.jpg?w=400', earned: false },
         { word: 'milk', img: 'https://thumb.ac-illust.com/c2/c29d5122113fb72d9178ad85e1e854c3_t.jpeg?w=400', earned: false },
         { word: 'bread', img: 'https://img.freepik.com/premium-vector/isolated-loaf-bread-slice-illustration_1274264-15470.jpg?w=400', earned: false },
         { word: 'butter', img: 'https://img.freepik.com/premium-vector/impressao_753212-2904.jpg?w=400', earned: false },
-        { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false }
+        { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false },
+        { word: 'rice', img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?semt=ais_hybrid&w=400', earned: false },
+        { word: 'soup', img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', earned: false },
+        { word: 'porridge', img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', earned: false },
+        { word: 'noodle', img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?semt=ais_hybrid&w=400', earned: false },
+
+//        { word: 'jelly', img: 'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'biscuit', img: 'https://img.freepik.com/free-vector/biscuit-cookies-cracker-with-cream-vector_1441-775.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'cheese', img: 'https://img.freepik.com/premium-vector/cheese-board-cheese-dices-slices-vector-art_1290085-8070.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'chocolate', img: 'https://img.freepik.com/premium-vector/chocolate-opened-package-white-background_269543-2547.jpg?semt=ais_user_personalization&w=400', earned: false },
+ 
+//       { word: 'mango', img: 'https://img.freepik.com/free-vector/whole-mango-cut-pieces-3d-illustration-cartoon-drawing-yellow-tasty-fruit-natural-food-product-with-vitamins-3d-style-white-background-food-fruits-healthy-eating-concept_778687-1633.jpg?semt=ais_hybrid&w=400', earned: false },
+ //       { word: 'grapes', img: 'https://img.freepik.com/premium-vector/picture-bunch-grapes-with-green-leaf_909058-7592.jpg?semt=ais_hybrid&w=400', earned: false },
+ //       { word: 'banana', img: 'https://img.freepik.com/free-vector/vector-ripe-yellow-banana-bunch-isolated-white-background_1284-45456.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'pineapple', img: 'https://img.freepik.com/premium-photo/large-fresh-ripe-fruit-pineapple-fruit-summer_262193-1325.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'papaya', img: 'https://img.freepik.com/premium-vector/papaya-isolated-white-background_1291186-77.jpg?semt=ais_hybrid&w=400', earned: false }
     ];
 
     let learnList = [...wordList].sort(() => 0.5 - Math.random());
@@ -286,6 +335,7 @@
     let matchIdx = 0;
     let spellIdx = 0;
     let spellInput = "";
+    let pressTimer;
 
     function playDing() {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -349,6 +399,7 @@
         window.speechSynthesis.speak(msg);
     }
 
+    // LEARN MODULE
     function renderLearn() {
         const item = learnList[learnIdx];
         document.getElementById('learn-img').src = item.img;
@@ -356,7 +407,11 @@
     }
 
     async function handleLearnClick() {
-        const word = learnList[learnIdx].word;
+        await spellOutSequence(learnList[learnIdx].word);
+    }
+
+    async function spellOutSequence(word) {
+        window.speechSynthesis.cancel();
         speak(word);
         await new Promise(r => setTimeout(r, 1200)); 
         for (let char of word) {
@@ -366,6 +421,7 @@
         speak(word);
     }
 
+    // MATCH MODULE
     function renderMatch() {
         const correct = matchList[matchIdx];
         document.getElementById('match-img').src = correct.img;
@@ -388,6 +444,7 @@
         });
     }
 
+    // SPELL MODULE
     function renderSpell() {
         const item = spellList[spellIdx];
         document.getElementById('spell-img').src = item.img;
@@ -430,13 +487,51 @@
         }
     }
 
+    // LIBRARY MODULE & POPUP
     function renderLibrary() {
         const grid = document.getElementById('library-grid');
         grid.innerHTML = wordList.map(w => `
-            <div class="lib-item" onclick="speak('${w.word}')">${w.word}</div>
+            <div class="lib-item" 
+                 onclick="speak('${w.word}')"
+                 onmousedown="startPress('${w.word}')" 
+                 onmouseup="cancelPress()" 
+                 onmouseleave="cancelPress()"
+                 ontouchstart="startPress('${w.word}')" 
+                 ontouchend="cancelPress()">
+                ${w.word}
+            </div>
         `).join('');
     }
 
+    function startPress(word) {
+        pressTimer = window.setTimeout(() => showLibPopup(word), 600);
+    }
+
+    function cancelPress() {
+        clearTimeout(pressTimer);
+    }
+
+    async function showLibPopup(wordText) {
+        const item = wordList.find(w => w.word === wordText);
+        if (!item) return;
+
+        const popup = document.getElementById('lib-popup');
+        document.getElementById('popup-img').src = item.img;
+        document.getElementById('popup-word').innerText = item.word;
+        popup.style.display = 'flex';
+
+        const replayBtn = document.getElementById('replay-btn');
+        replayBtn.onclick = () => spellOutSequence(item.word);
+        
+        await spellOutSequence(item.word);
+    }
+
+    function closeLibPopup() {
+        window.speechSynthesis.cancel();
+        document.getElementById('lib-popup').style.display = 'none';
+    }
+
+    // STICKER BOOK
     function renderStickerBook() {
         const grid = document.getElementById('book-grid');
         grid.innerHTML = wordList.map(w => `
@@ -472,4 +567,3 @@
 </script>
 </body>
 </html>
-
