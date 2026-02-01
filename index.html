@@ -38,22 +38,29 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
             z-index: 100;
         }
 
         nav button {
-            padding: 8px 5px;
-            width: 70px;
-            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            width: 65px;
+            font-size: 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             background: white;
             font-weight: 700;
             font-family: 'Comic Neue', cursive;
             text-transform: lowercase;
             cursor: pointer;
+            line-height: 1.4;
         }
+
+        nav button span { font-size: 20px; margin-bottom: 2px; }
 
         .sticker-bar {
             background: white;
@@ -78,10 +85,7 @@
             transition: transform 0.3s ease;
         }
 
-        .sticker-slot.earned {
-            border: 1px solid var(--accent);
-            transform: scale(1.1);
-        }
+        .sticker-slot.earned { border: 1px solid var(--accent); transform: scale(1.1); }
 
         .container {
             flex: 1;
@@ -199,7 +203,6 @@
             padding: 10px;
         }
 
-        /* Popup Styles */
         .overlay {
             display: none;
             position: fixed;
@@ -211,6 +214,7 @@
             align-items: center;
             padding: 20px;
         }
+
         .popup-card {
             background: var(--bg);
             padding: 30px;
@@ -219,8 +223,8 @@
             max-width: 400px;
             text-align: center;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
+
         .close-btn {
             position: absolute;
             top: 15px;
@@ -232,6 +236,24 @@
             color: var(--gray);
         }
 
+        /* CONFETTI CSS */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            z-index: 2000;
+            top: -10px;
+            border-radius: 2px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(720deg);
+            }
+        }
+
         .locked { opacity: 0.2; filter: grayscale(1); }
         .sticker-img { width: 80%; height: 80%; object-fit: contain; }
     </style>
@@ -239,11 +261,11 @@
 <body>
 
 <nav>
-    <button onclick="showScreen('learn')">📖 learn</button>
-    <button onclick="showScreen('match')">🧩 match</button>
-    <button onclick="showScreen('spell')">✏️ spell</button>
-    <button onclick="showScreen('library')">📚 lib</button>
-    <button onclick="showScreen('book')">🏆 book</button>
+    <button onclick="showScreen('learn')"><span>📖</span>learn</button>
+    <button onclick="showScreen('match')"><span>🧩</span>match</button>
+    <button onclick="showScreen('spell')"><span>✏️</span>spell</button>
+    <button onclick="showScreen('library')"><span>📚</span>lib</button>
+    <button onclick="showScreen('book')"><span>🏆</span>book</button>
 </nav>
 
 <div id="sticker-bar" class="sticker-bar"></div>
@@ -308,21 +330,20 @@
         { word: 'milk', img: 'https://thumb.ac-illust.com/c2/c29d5122113fb72d9178ad85e1e854c3_t.jpeg?w=400', earned: false },
         { word: 'bread', img: 'https://img.freepik.com/premium-vector/isolated-loaf-bread-slice-illustration_1274264-15470.jpg?w=400', earned: false },
         { word: 'butter', img: 'https://img.freepik.com/premium-vector/impressao_753212-2904.jpg?w=400', earned: false },
-        { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false },
-        { word: 'rice', img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?semt=ais_hybrid&w=400', earned: false },
-        { word: 'soup', img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', earned: false },
-        { word: 'porridge', img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', earned: false },
-        { word: 'noodle', img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?semt=ais_hybrid&w=400', earned: false },
+        { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false }
 
+//        { word: 'rice', img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'soup', img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', earned: false },
+//        { word: 'porridge', img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', earned: false },
+//        { word: 'noodle', img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'jelly', img: 'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'biscuit', img: 'https://img.freepik.com/free-vector/biscuit-cookies-cracker-with-cream-vector_1441-775.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'cheese', img: 'https://img.freepik.com/premium-vector/cheese-board-cheese-dices-slices-vector-art_1290085-8070.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'chocolate', img: 'https://img.freepik.com/premium-vector/chocolate-opened-package-white-background_269543-2547.jpg?semt=ais_user_personalization&w=400', earned: false },
- 
 //       { word: 'mango', img: 'https://img.freepik.com/free-vector/whole-mango-cut-pieces-3d-illustration-cartoon-drawing-yellow-tasty-fruit-natural-food-product-with-vitamins-3d-style-white-background-food-fruits-healthy-eating-concept_778687-1633.jpg?semt=ais_hybrid&w=400', earned: false },
- //       { word: 'grapes', img: 'https://img.freepik.com/premium-vector/picture-bunch-grapes-with-green-leaf_909058-7592.jpg?semt=ais_hybrid&w=400', earned: false },
- //       { word: 'banana', img: 'https://img.freepik.com/free-vector/vector-ripe-yellow-banana-bunch-isolated-white-background_1284-45456.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'grapes', img: 'https://img.freepik.com/premium-vector/picture-bunch-grapes-with-green-leaf_909058-7592.jpg?semt=ais_hybrid&w=400', earned: false },
+//        { word: 'banana', img: 'https://img.freepik.com/free-vector/vector-ripe-yellow-banana-bunch-isolated-white-background_1284-45456.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'pineapple', img: 'https://img.freepik.com/premium-photo/large-fresh-ripe-fruit-pineapple-fruit-summer_262193-1325.jpg?semt=ais_hybrid&w=400', earned: false },
 //        { word: 'papaya', img: 'https://img.freepik.com/premium-vector/papaya-isolated-white-background_1291186-77.jpg?semt=ais_hybrid&w=400', earned: false }
     ];
@@ -331,43 +352,40 @@
     let matchList = [...wordList].sort(() => 0.5 - Math.random());
     let spellList = [...wordList].sort(() => 0.5 - Math.random());
 
-    let learnIdx = 0;
-    let matchIdx = 0;
-    let spellIdx = 0;
-    let spellInput = "";
-    let pressTimer;
+    let learnIdx = 0, matchIdx = 0, spellIdx = 0, spellInput = "", pressTimer;
+
+    // CONFETTI LOGIC
+    function launchConfetti() {
+        const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F43', '#A29BFE'];
+        for(let i=0; i<50; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            c.style.width = Math.random() * 8 + 5 + 'px';
+            c.style.height = c.style.width;
+            c.style.animationDuration = Math.random() * 2 + 1 + 's';
+            c.style.opacity = Math.random();
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3000);
+        }
+    }
 
     function playDing() {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc1 = audioCtx.createOscillator();
         const gain1 = audioCtx.createGain();
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-
         osc1.connect(gain1); gain1.connect(audioCtx.destination);
-        osc2.connect(gain2); gain2.connect(audioCtx.destination);
-
         osc1.type = 'sine'; osc1.frequency.setValueAtTime(1046.50, audioCtx.currentTime); 
-        osc2.type = 'sine'; osc2.frequency.setValueAtTime(1318.51, audioCtx.currentTime);
-
         gain1.gain.setValueAtTime(0, audioCtx.currentTime);
         gain1.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
         gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-
-        gain2.gain.setValueAtTime(0, audioCtx.currentTime);
-        gain2.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
-        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-
-        osc1.start(); osc2.start();
-        osc1.stop(audioCtx.currentTime + 1.2); osc2.stop(audioCtx.currentTime + 1.2);
+        osc1.start(); osc1.stop(audioCtx.currentTime + 1);
     }
 
     function updateStickerBar() {
-        const bar = document.getElementById('sticker-bar');
-        bar.innerHTML = wordList.map(w => `
-            <div class="sticker-slot ${w.earned ? 'earned' : ''}" 
-                 style="${w.earned ? 'background-image:url('+w.img+')' : ''}">
-            </div>
+        document.getElementById('sticker-bar').innerHTML = wordList.map(w => `
+            <div class="sticker-slot ${w.earned ? 'earned' : ''}" style="${w.earned ? 'background-image:url('+w.img+')' : ''}"></div>
         `).join('');
     }
 
@@ -376,10 +394,9 @@
         if (item && !item.earned) {
             item.earned = true;
             updateStickerBar();
-            playDing();
-        } else if (item && item.earned) {
-            playDing();
         }
+        playDing();
+        launchConfetti();
     }
 
     function showScreen(id) {
@@ -399,16 +416,13 @@
         window.speechSynthesis.speak(msg);
     }
 
-    // LEARN MODULE
     function renderLearn() {
         const item = learnList[learnIdx];
         document.getElementById('learn-img').src = item.img;
         document.getElementById('learn-word').innerText = item.word;
     }
 
-    async function handleLearnClick() {
-        await spellOutSequence(learnList[learnIdx].word);
-    }
+    async function handleLearnClick() { await spellOutSequence(learnList[learnIdx].word); }
 
     async function spellOutSequence(word) {
         window.speechSynthesis.cancel();
@@ -421,7 +435,6 @@
         speak(word);
     }
 
-    // MATCH MODULE
     function renderMatch() {
         const correct = matchList[matchIdx];
         document.getElementById('match-img').src = correct.img;
@@ -437,14 +450,13 @@
                 if(opt.word === correct.word) {
                     earnSticker(correct.word);
                     speak(correct.word);
-                    setTimeout(() => nextItem('match'), 1200);
+                    setTimeout(() => nextItem('match'), 1500);
                 } else { speak("no", 1.2); }
             };
             container.appendChild(btn);
         });
     }
 
-    // SPELL MODULE
     function renderSpell() {
         const item = spellList[spellIdx];
         document.getElementById('spell-img').src = item.img;
@@ -459,8 +471,7 @@
         pool.innerHTML = '';
         currentWord.split('').sort(() => 0.5 - Math.random()).forEach(l => {
             const btn = document.createElement('button');
-            btn.className = 'letter-btn';
-            btn.innerText = l;
+            btn.className = 'letter-btn'; btn.innerText = l;
             btn.onclick = () => {
                 const slots = document.querySelectorAll('.slot');
                 if(spellInput.length < currentWord.length) {
@@ -487,42 +498,25 @@
         }
     }
 
-    // LIBRARY MODULE & POPUP
     function renderLibrary() {
         const grid = document.getElementById('library-grid');
         grid.innerHTML = wordList.map(w => `
-            <div class="lib-item" 
-                 onclick="speak('${w.word}')"
-                 onmousedown="startPress('${w.word}')" 
-                 onmouseup="cancelPress()" 
-                 onmouseleave="cancelPress()"
-                 ontouchstart="startPress('${w.word}')" 
-                 ontouchend="cancelPress()">
+            <div class="lib-item" onclick="speak('${w.word}')" onmousedown="startPress('${w.word}')" onmouseup="cancelPress()" onmouseleave="cancelPress()" ontouchstart="startPress('${w.word}')" ontouchend="cancelPress()">
                 ${w.word}
             </div>
         `).join('');
     }
 
-    function startPress(word) {
-        pressTimer = window.setTimeout(() => showLibPopup(word), 600);
-    }
-
-    function cancelPress() {
-        clearTimeout(pressTimer);
-    }
+    function startPress(word) { pressTimer = window.setTimeout(() => showLibPopup(word), 600); }
+    function cancelPress() { clearTimeout(pressTimer); }
 
     async function showLibPopup(wordText) {
         const item = wordList.find(w => w.word === wordText);
         if (!item) return;
-
-        const popup = document.getElementById('lib-popup');
+        document.getElementById('lib-popup').style.display = 'flex';
         document.getElementById('popup-img').src = item.img;
         document.getElementById('popup-word').innerText = item.word;
-        popup.style.display = 'flex';
-
-        const replayBtn = document.getElementById('replay-btn');
-        replayBtn.onclick = () => spellOutSequence(item.word);
-        
+        document.getElementById('replay-btn').onclick = () => spellOutSequence(item.word);
         await spellOutSequence(item.word);
     }
 
@@ -531,13 +525,10 @@
         document.getElementById('lib-popup').style.display = 'none';
     }
 
-    // STICKER BOOK
     function renderStickerBook() {
-        const grid = document.getElementById('book-grid');
-        grid.innerHTML = wordList.map(w => `
+        document.getElementById('book-grid').innerHTML = wordList.map(w => `
             <div class="sticker-page-item ${w.earned ? '' : 'locked'}">
-                <img class="sticker-img" src="${w.img}">
-                <div style="font-size:12px; margin-top:5px;">${w.earned ? w.word : '???'}</div>
+                <img class="sticker-img" src="${w.img}"><div style="font-size:12px; margin-top:5px;">${w.earned ? w.word : '???'}</div>
             </div>
         `).join('');
     }
