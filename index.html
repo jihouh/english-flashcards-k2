@@ -31,26 +31,26 @@
             user-select: none;
         }
 
-        /* FLOATING FULLSCREEN BUTTON */
+        /* UPDATED FULLSCREEN BUTTON LOCATION */
         .fullscreen-toggle {
             position: fixed;
-            top: 15px;
-            right: 15px;
+            bottom: 20px;
+            right: 20px;
             z-index: 2000;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             background: white;
             border: 2px solid var(--light-gray);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s, background-color 0.2s;
         }
-        .fullscreen-toggle:active { transform: scale(0.9); }
+        .fullscreen-toggle:active { transform: scale(0.9); background-color: #f0f0f0; }
 
         nav {
             background: var(--primary);
@@ -319,7 +319,8 @@
 </div>
 
 <script>
-      let wordList = [
+    // Word List and Data Initialization
+       let wordList = [
         { word: 'cake', img: 'https://img.freepik.com/premium-vector/delicious-cake-clipart-vector-art-illustration_761413-18518.jpg?w=400', earned: false },
         { word: 'milk', img: 'https://thumb.ac-illust.com/c2/c29d5122113fb72d9178ad85e1e854c3_t.jpeg?w=400', earned: false },
         { word: 'bread', img: 'https://img.freepik.com/premium-vector/isolated-loaf-bread-slice-illustration_1274264-15470.jpg?w=400', earned: false },
@@ -349,6 +350,7 @@
 
     let learnIdx = 0, matchIdx = 0, spellIdx = 0, spellInput = "", pressTimer;
 
+    // Fullscreen Logic
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => console.log(err));
@@ -357,6 +359,7 @@
         }
     }
 
+    // Reward Logic (Confetti + Sound)
     function launchConfetti() {
         const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F43', '#A29BFE'];
         for(let i=0; i<50; i++) {
@@ -383,6 +386,7 @@
         osc.start(); osc.stop(audioCtx.currentTime + 1);
     }
 
+    // Core Navigation & UI
     function updateStickerBar() {
         document.getElementById('sticker-bar').innerHTML = wordList.map(w => `
             <div class="sticker-slot ${w.earned ? 'earned' : ''}" style="${w.earned ? 'background-image:url('+w.img+')' : ''}"></div>
@@ -411,6 +415,7 @@
         msg.rate = rate; window.speechSynthesis.speak(msg);
     }
 
+    // Module Renders
     function renderLearn() {
         const item = learnList[learnIdx];
         document.getElementById('learn-img').src = item.img;
