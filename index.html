@@ -52,6 +52,20 @@
         .hud-item { text-align: center; font-family: 'Klee One'; font-weight: bold; }
         .hud-val { font-size: 18px; color: var(--challenge); }
         #ch-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin-top: 20px; }
+        
+        /* FIX: Ensure challenge slots are visible and styled */
+        #ch-content .slot {
+            display: inline-block;
+            min-width: 30px;
+            height: 45px;
+            margin: 0 4px;
+            border-bottom: 4px solid var(--challenge);
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-align: center;
+            font-family: 'Comic Neue';
+            font-weight: bold;
+        }
 
         /* Shared Components */
         .instruction-text { font-family: 'Klee One', cursive; color: var(--gray); font-size: 22px; margin-bottom: 15px; text-align: center; }
@@ -221,26 +235,26 @@
 
 <script>
     let defaultWords = [
-        { word: 'cake', img: 'https://img.freepik.com/premium-vector/delicious-cake-clipart-vector-art-illustration_761413-18518.jpg?w=400', count: 0, active: true  },
-          { word: 'milk', img: 'https://thumb.ac-illust.com/c2/c29d5122113fb72d9178ad85e1e854c3_t.jpeg?w=400', count: 0, active: true  },
-          { word: 'bread', img: 'https://img.freepik.com/premium-vector/isolated-loaf-bread-slice-illustration_1274264-15470.jpg?w=400', count: 0, active: true },
-          { word: 'butter', img: 'https://img.freepik.com/premium-vector/impressao_753212-2904.jpg?w=400', count: 0, active: true  },
-          { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false },
+        { word: 'cake', img: 'https://img.freepik.com/premium-vector/delicious-cake-clipart-vector-art-illustration_761413-18518.jpg?w=400', count: 0, active: false  },
+        { word: 'milk', img: 'https://thumb.ac-illust.com/c2/c29d5122113fb72d9178ad85e1e854c3_t.jpeg?w=400', count: 0, active: false  },
+        { word: 'bread', img: 'https://img.freepik.com/premium-vector/isolated-loaf-bread-slice-illustration_1274264-15470.jpg?w=400', count: 0, active: false },
+        { word: 'butter', img: 'https://img.freepik.com/premium-vector/impressao_753212-2904.jpg?w=400', count: 0, active: false  },
+        { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', count: 0, active: false },
         { word: 'rice', img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?w=400', count: 0, active: true },
         { word: 'soup', img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', count: 0, active: true },
-           { word: 'food', img: 'https://img.freepik.com/premium-photo/authentic-chinese-food-photo-spring-rolls-noodles-dumplings-rice_1088041-52973.jpg?semt=ais_hybrid&w=740&q=80', count: 0, active: true },       
+        { word: 'food', img: 'https://img.freepik.com/premium-photo/authentic-chinese-food-photo-spring-rolls-noodles-dumplings-rice_1088041-52973.jpg?semt=ais_hybrid&w=740&q=80', count: 0, active: true },       
         { word: 'porridge', img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', count: 0, active: true },
         { word: 'noodle', img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
         { word: 'jelly', img: 'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?w=400', count: 0, active: true },  
-        { word: 'biscuit', img: 'https://img.freepik.com/free-vector/biscuit-cookies-cracker-with-cream-vector_1441-775.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
-        { word: 'cheese', img: 'https://img.freepik.com/premium-vector/cheese-board-cheese-dices-slices-vector-art_1290085-8070.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
-        { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
-        { word: 'chocolate', img: 'https://img.freepik.com/premium-vector/chocolate-opened-package-white-background_269543-2547.jpg?semt=ais_user_personalization&w=400', count: 0, active: true },
-       { word: 'mango', img: 'https://img.freepik.com/free-vector/whole-mango-cut-pieces-3d-illustration-cartoon-drawing-yellow-tasty-fruit-natural-food-product-with-vitamins-3d-style-white-background-food-fruits-healthy-eating-concept_778687-1633.jpg?semt=ais_hybrid&w=400', earned: false },
-        { word: 'grapes', img: 'https://img.freepik.com/premium-vector/picture-bunch-grapes-with-green-leaf_909058-7592.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
-         { word: 'pineapple', img: 'https://img.freepik.com/premium-photo/large-fresh-ripe-fruit-pineapple-fruit-summer_262193-1325.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
-        { word: 'papaya', img: 'https://img.freepik.com/premium-vector/papaya-isolated-white-background_1291186-77.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
-        { word: 'banana', img: 'https://img.freepik.com/free-vector/vector-ripe-yellow-banana-bunch-isolated-white-background_1284-45456.jpg?semt=ais_hybrid&w=400', count: 0, active: true }
+        { word: 'biscuit', img: 'https://img.freepik.com/free-vector/biscuit-cookies-cracker-with-cream-vector_1441-775.jpg?semt=ais_hybrid&w=400', count: 0, active: false },
+        { word: 'cheese', img: 'https://img.freepik.com/premium-vector/cheese-board-cheese-dices-slices-vector-art_1290085-8070.jpg?semt=ais_hybrid&w=400', count: 0, active: false },
+        { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?semt=ais_hybrid&w=400', count: 0, active: false },
+        { word: 'chocolate', img: 'https://img.freepik.com/premium-vector/chocolate-opened-package-white-background_269543-2547.jpg?semt=ais_user_personalization&w=400', count: 0, active: false },
+        { word: 'mango', img: 'https://img.freepik.com/free-vector/whole-mango-cut-pieces-3d-illustration-cartoon-drawing-yellow-tasty-fruit-natural-food-product-with-vitamins-3d-style-white-background-food-fruits-healthy-eating-concept_778687-1633.jpg?semt=ais_hybrid&w=400', count: 0, active: true },
+        { word: 'grapes', img: 'https://img.freepik.com/premium-vector/picture-bunch-grapes-with-green-leaf_909058-7592.jpg?semt=ais_hybrid&w=400', count: 0, active: false },
+        { word: 'pineapple', img: 'https://img.freepik.com/premium-photo/large-fresh-ripe-fruit-pineapple-fruit-summer_262193-1325.jpg?semt=ais_hybrid&w=400', count: 0, active: false },
+        { word: 'papaya', img: 'https://img.freepik.com/premium-vector/papaya-isolated-white-background_1291186-77.jpg?semt=ais_hybrid&w=400', count: 0, active: false },
+        { word: 'banana', img: 'https://img.freepik.com/free-vector/vector-ripe-yellow-banana-bunch-isolated-white-background_1284-45456.jpg?semt=ais_hybrid&w=400', count: 0, active: false }
     ];
 
     let wordList = JSON.parse(localStorage.getItem('ss_wordlist')) || defaultWords;
@@ -254,12 +268,9 @@
     let chInterval, chScore, chTimeLeft, chWrongCount = 0, chWrongWords = [], chTaskType = "match";
     let learnIdx=0, matchIdx=0, spellIdx=0, spellInput="", holdTimer;
 
-    // Fixed source of truth for all modules
     function getActive() { 
         let active = wordList.filter(w => w.active);
         if (isRandom) {
-            // Consistent seeded shuffle or random shuffle every call? 
-            // We use simple sort here but ensure index remains valid.
             return [...active].sort((a,b) => a.word.localeCompare(b.word)).sort(() => 0.5 - Math.random());
         }
         return active;
@@ -365,45 +376,84 @@
         }, 1000);
     }
 
+    /* FIX: Corrected nextChTask to target local elements and handle spaces */
     function nextChTask() {
         const active = getActive();
         const item = active[Math.floor(Math.random() * active.length)];
-        document.getElementById('ch-img').src = item.img;
-        const container = document.getElementById('ch-content'); container.innerHTML = '';
+        const container = document.getElementById('ch-content');
+        const instruction = document.getElementById('ch-instruction');
+        const img = document.getElementById('ch-img');
+        
+        img.src = item.img;
+        container.innerHTML = '';
+        spellInput = "";
 
         if(chTaskType === "match") {
-            document.getElementById('ch-instruction').innerText = "Match it!";
+            instruction.innerText = "Match it!";
             let opts = [...active].sort(() => 0.5 - Math.random()).slice(0, 3);
             if(!opts.find(o => o.word === item.word)) opts[0] = item;
             opts.sort(() => 0.5 - Math.random()).forEach(opt => {
-                const b = document.createElement('button'); b.className = 'match-btn'; b.innerText = opt.word;
+                const b = document.createElement('button');
+                b.className = 'match-btn';
+                b.innerText = opt.word;
                 b.onclick = () => {
-                    if(opt.word === item.word) { chScore += 10; chTaskType = "spell"; nextChTask(); }
-                    else { chWrongCount++; chWrongWords.push(item.word); speak("Try again"); }
-                    document.getElementById('ch-score').innerText = chScore;
+                    if(opt.word === item.word) {
+                        chScore += 10;
+                        chTaskType = "spell";
+                        document.getElementById('ch-score').innerText = chScore;
+                        nextChTask();
+                    } else {
+                        chWrongCount++;
+                        chWrongWords.push(item.word);
+                        speak("Try again");
+                    }
                 };
                 container.appendChild(b);
             });
         } else {
-            document.getElementById('ch-instruction').innerText = "Spell it!";
-            spellInput = "";
-            const row = document.createElement('div'); row.className = 'spell-row';
-            item.word.split('').forEach(() => { const s = document.createElement('div'); s.className = 'slot'; row.appendChild(s); });
+            instruction.innerText = "Spell it!";
+            const row = document.createElement('div');
+            row.className = 'spell-row';
+            
+            // Handle spaces for words like "ice cream"
+            item.word.split('').forEach(char => {
+                const s = document.createElement('div');
+                s.className = char === ' ' ? 'slot-space' : 'slot';
+                if(char === ' ') s.style.width = '20px';
+                row.appendChild(s);
+            });
             container.appendChild(row);
-            const pool = document.createElement('div'); pool.style.display="flex"; pool.style.flexWrap="wrap"; pool.style.gap="5px"; pool.style.justifyContent="center";
-            item.word.split('').sort(() => 0.5 - Math.random()).forEach(l => {
-                const b = document.createElement('button'); b.className = 'letter-btn'; b.innerText = l;
+
+            const pool = document.createElement('div');
+            pool.style.display="flex"; pool.style.flexWrap="wrap"; pool.style.gap="8px"; pool.style.justifyContent="center";
+            
+            // Shuffle letters only
+            const letters = item.word.replace(/\s/g, '').split('').sort(() => 0.5 - Math.random());
+            
+            letters.forEach(l => {
+                const b = document.createElement('button');
+                b.className = 'letter-btn';
+                b.innerText = l;
                 b.onclick = () => {
-                    const slots = container.querySelectorAll('.slot');
+                    const slots = row.querySelectorAll('.slot'); // Targets current task row
                     if(spellInput.length < slots.length) {
-                        slots[spellInput.length].innerText = l; spellInput += l;
-                        if(spellInput === item.word) { chScore += 20; chTaskType = "match"; setTimeout(nextChTask, 400); }
-                        else if(spellInput.length === item.word.length) { 
-                            chWrongCount++; chWrongWords.push(item.word);
-                            spellInput = ""; slots.forEach(s => s.innerText=""); speak("Try again"); 
+                        slots[spellInput.length].innerText = l;
+                        spellInput += l;
+                        speak(l);
+
+                        if(spellInput === item.word.replace(/\s/g, '')) {
+                            chScore += 20;
+                            chTaskType = "match";
+                            document.getElementById('ch-score').innerText = chScore;
+                            setTimeout(nextChTask, 600);
+                        } else if(spellInput.length === slots.length) {
+                            chWrongCount++;
+                            chWrongWords.push(item.word);
+                            spellInput = "";
+                            slots.forEach(s => s.innerText="");
+                            speak("Try again");
                         }
                     }
-                    document.getElementById('ch-score').innerText = chScore;
                 };
                 pool.appendChild(b);
             });
@@ -422,7 +472,6 @@
         showScreen('home');
     }
 
-    // Navigation
     function nextItem(m) { 
         const a = getActive(); if(!a.length) return;
         if(m==='learn') { learnIdx = (learnIdx + 1) % a.length; renderLearn(); } 
@@ -435,7 +484,6 @@
         if(m==='match') { matchIdx = (matchIdx - 1 + a.length) % a.length; renderMatch(); }
     }
 
-    // Admin Tools
     function updateDiff(val) { spellDifficulty = parseInt(val); document.getElementById('diff-desc').innerText = "Difficulty: " + val + "% Hidden"; localStorage.setItem('ss_difficulty', val); }
     function updateChTimer(val) { chTimeLimit = parseInt(val); document.getElementById('ch-timer-val').innerText = val + "s"; localStorage.setItem('ss_ch_timer', val); }
     function toggleRandom(val) { isRandom = val; localStorage.setItem('ss_random', val); }
@@ -475,7 +523,6 @@
         });
     }
 
-    // Voice & Helpers
     function handleBackspace() { const slots = document.querySelectorAll('#spell-container .slot:not(.prefilled)'); if (spellInput.length > 0) { spellInput = spellInput.slice(0, -1); slots[spellInput.length].innerText = ""; } }
     function speak(t) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; window.speechSynthesis.speak(u); }
     async function spellSequence(word) {
@@ -498,4 +545,3 @@
 </script>
 </body>
 </html>
-
