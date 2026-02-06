@@ -4,479 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Small Steps Spelling</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #FF6B6B;
-            --secondary: #4ECDC4;
-            --accent: #FFE66D;
-            --bg: #F7FFF7;
-            --gray: #888;
-            --light-gray: #e0e0e0;
-            --delete: #ff9f43;
+            --primary: #FF6B6B; --secondary: #4ECDC4; --accent: #FFE66D;
+            --blue: #45aaf2; --bg: #F7FFF7; --gray: #555;
+            --light-gray: #e0e0e0; --delete: #ff9f43;
+            --purple: #a55eea; --shadow: #d4e5d4;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Comic Neue', cursive;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            -webkit-user-select: none;
-            user-select: none;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+            -webkit-user-select: none; user-select: none;
         }
 
-        /* UPDATED FULLSCREEN BUTTON LOCATION */
-        .fullscreen-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 2000;
-            width: 50px;
-            height: 50px;
-            background: white;
-            border: 2px solid var(--light-gray);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: transform 0.2s, background-color 0.2s;
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg); }
+        h1 { font-size: 22px; color: var(--primary); margin: 0; font-family: 'Klee One', cursive; font-weight: 600; }
+        .fullscreen-btn { background: #eee; color: #666; font-size: 13px; padding: 8px 12px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; font-weight: bold; }
+
+        .nav-bar {
+            position: fixed; bottom: 0; width: 100%; background: white; 
+            display: flex; justify-content: space-around; padding: 15px 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 100;
         }
-        .fullscreen-toggle:active { transform: scale(0.9); background-color: #f0f0f0; }
+        .nav-item { font-family: 'Klee One', cursive; font-weight: bold; color: #888; cursor: pointer; font-size: 16px; text-align: center; flex: 1; }
+        .nav-item i { display: block; font-size: 26px; margin-bottom: 4px; font-style: normal; }
+        .nav-item.active { color: var(--primary); }
 
-        nav {
-            background: var(--primary);
-            width: 100%;
-            padding: calc(env(safe-area-inset-top) + 10px) 10px 10px 10px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            z-index: 100;
-        }
+        .instruction-text { font-family: 'Klee One', cursive; color: var(--gray); font-size: 22px; margin-bottom: 10px; text-align: center; padding: 0 10px; font-weight: 600; }
 
-        nav button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 0;
-            width: 65px;
-            font-size: 13px;
-            border: none;
-            border-radius: 12px;
-            background: white;
-            font-weight: 700;
-            font-family: 'Comic Neue', cursive;
-            text-transform: lowercase;
-            cursor: pointer;
-            line-height: 1.4;
-        }
-
-        nav button span { font-size: 20px; margin-bottom: 2px; }
-
-        .sticker-bar {
-            background: white;
-            width: 100%;
-            padding: 8px;
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            border-bottom: 1px solid var(--light-gray);
-            overflow-x: auto;
-        }
-
-        .sticker-slot {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #f9f9f9;
-            border: 1px dashed #ccc;
-            background-size: cover;
-            background-position: center;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-
-        .sticker-slot.earned { border: 1px solid var(--accent); transform: scale(1.1); }
-
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .screen { display: none; width: 100%; max-width: 800px; animation: fadeIn 0.3s; }
-        .active { display: flex; flex-direction: column; align-items: center; }
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 20px 120px 20px; overflow-y: auto; }
+        .screen { display: none; width: 100%; max-width: 500px; animation: fadeIn 0.3s; }
+        .active-screen { display: flex; flex-direction: column; align-items: center; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card-img {
-            max-width: 80%;
-            max-height: 30vh;
-            border-radius: 20px;
-            background: white;
-            padding: 10px;
-            border: 1px solid var(--light-gray);
+        .quote-card {
+            background: white; width: 100%; padding: 20px; border-radius: 20px;
+            border: 2px solid var(--shadow); box-shadow: 0 4px 10px var(--shadow);
+            margin: 15px 0; text-align: center; cursor: pointer;
+        }
+        .quote-text { font-family: 'Klee One', cursive; color: var(--purple); font-size: 20px; font-weight: bold; line-height: 1.4; }
+
+        button.action-btn { 
+            padding: 15px 10px; border-radius: 20px; border: none; color: white; 
+            font-weight: 900; cursor: pointer; font-family: 'Klee One', cursive; 
+            box-shadow: 0 5px 0 rgba(0,0,0,0.1); font-size: 20px; text-transform: uppercase;
         }
 
-        .big-word {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            color: var(--primary);
-            margin: 15px 0;
-            letter-spacing: 4px;
-            cursor: pointer;
+        .card-img { max-width: 90%; max-height: 25vh; border-radius: 25px; background: white; padding: 15px; border: 5px solid var(--secondary); box-shadow: 0 8px 0px var(--shadow); }
+        .big-word { font-size: clamp(3rem, 10vw, 5rem); color: var(--primary); margin: 20px 0; font-family: 'Comic Neue', cursive; font-weight: bold; cursor: pointer; }
+
+        .match-btn {
+            width: 100%; background: #ffffff; color: #222; 
+            font-size: 34px; font-weight: 800; padding: 25px; 
+            border-radius: 25px; border: 4px solid var(--accent);
+            box-shadow: 0 8px 0px var(--accent); margin-bottom: 20px;
+            font-family: 'Comic Neue', cursive; cursor: pointer;
         }
 
-        .nav-controls {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
+        .lib-card { background: white; color: black; border: 3px solid var(--light-gray); height: 110px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-family: 'Comic Neue', cursive; font-weight: bold; border-radius: 20px; box-shadow: 0 5px 0 #ddd; cursor: pointer; }
+        
+        .sticker-slot { position: relative; background: white; border: 3px dashed #ccc; border-radius: 20px; padding: 12px; text-align: center; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .sticker-slot.unlocked { border: 3px solid var(--accent); background: #fffdf5; }
+        .sticker-img { width: 80px; height: 80px; object-fit: contain; }
+        .star-badge { position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
 
-        .nav-controls button {
-            background: transparent;
-            border: 1px solid var(--light-gray);
-            color: var(--gray);
-            padding: 10px;
-            border-radius: 20px;
-            font-size: 15px;
-            width: 100px;
-            cursor: pointer;
-        }
+        .slot { width: 50px; height: 60px; border-bottom: 5px solid var(--secondary); display: inline-block; margin: 0 6px; font-size: 2.5rem; color: var(--primary); text-align: center; font-family: 'Comic Neue'; font-weight: bold; }
+        .letter-btn { width: 75px; height: 75px; background: var(--blue); border: none; border-radius: 18px; box-shadow: 0 5px 0px #348ecc; font-size: 2.2rem; font-family: 'Comic Neue', cursive; cursor: pointer; font-weight: bold; color: white; }
 
-        .slot {
-            width: clamp(28px, 6vw, 45px);
-            height: 50px;
-            border-bottom: 3px solid var(--light-gray);
-            display: inline-block;
-            margin: 0 4px;
-            font-size: 2rem;
-            color: var(--primary);
-            text-align: center;
-        }
-
-        .letter-btn {
-            width: 65px; height: 65px;
-            background: var(--accent);
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 3px 0px #e6cc52;
-            font-size: 1.5rem;
-            font-family: 'Comic Neue', cursive;
-            cursor: pointer;
-        }
-
-        .backspace-btn {
-            width: 65px; height: 65px;
-            background: var(--delete);
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 3px 0px #d38334;
-            color: white;
-            font-size: 1.8rem;
-            cursor: pointer;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 12px;
-            width: 100%;
-        }
-
-        .lib-item {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid var(--light-gray);
-            text-align: center;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .popup-card {
-            background: var(--bg);
-            padding: 30px;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            position: relative;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 15px;
-            background: none; border: none;
-            font-size: 24px; cursor: pointer; color: var(--gray);
-        }
-
-        .confetti {
-            position: fixed; width: 10px; height: 10px;
-            z-index: 2000; top: -10px; border-radius: 2px;
-            animation: fall linear forwards;
-        }
-        @keyframes fall { to { transform: translateY(105vh) rotate(720deg); } }
-
-        .locked { opacity: 0.2; filter: grayscale(1); }
-        .sticker-img { width: 80%; height: 80%; object-fit: contain; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+        .popup-card { background: white; padding: 35px; border-radius: 35px; width: 340px; text-align: center; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; font-size: 24px; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<button class="fullscreen-toggle" onclick="toggleFullscreen()" title="Toggle Fullscreen">
-    📺
-</button>
-
-<nav>
-    <button onclick="showScreen('learn')"><span>📖</span>learn</button>
-    <button onclick="showScreen('match')"><span>🧩</span>match</button>
-    <button onclick="showScreen('spell')"><span>✏️</span>spell</button>
-    <button onclick="showScreen('library')"><span>📚</span>lib</button>
-    <button onclick="showScreen('book')"><span>🏆</span>book</button>
-</nav>
-
-<div id="sticker-bar" class="sticker-bar"></div>
-
-<div id="lib-popup" class="overlay">
-    <div class="popup-card">
-        <button class="close-btn" onclick="closeLibPopup()">✖</button>
-        <img id="popup-img" class="card-img" src="" style="max-height: 200px; margin-bottom: 15px;">
-        <div id="popup-word" class="big-word">word</div>
-        <button id="replay-btn" class="letter-btn" style="width: auto; padding: 0 20px; height: 50px; font-size: 1rem;">🔊 replay</button>
+    <div class="header">
+        <h1>Small Steps Spelling ✨</h1>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">🖥️ FULLSCREEN</button>
     </div>
-</div>
 
-<div class="container">
-    <div id="learn" class="screen active">
-        <img id="learn-img" class="card-img" src="">
-        <div id="learn-word" class="big-word" onclick="handleLearnClick()">word</div>
-        <div class="nav-controls">
-            <button onclick="prevItem('learn')">back</button>
-            <button onclick="nextItem('learn')">next</button>
+    <div id="lib-popup" class="overlay">
+        <div class="popup-card">
+            <button class="close-btn" onclick="closePopup()">✖</button>
+            <img id="pop-img" src="" class="card-img" style="max-height: 180px;">
+            <div id="pop-word" class="big-word">word</div>
+            <button class="action-btn" style="background: var(--secondary); width: 100%;" onclick="replayPopSequence()">🔊 SPELL AGAIN</button>
         </div>
     </div>
 
-    <div id="match" class="screen">
-        <img id="match-img" class="card-img" src="">
-        <div id="match-options" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:20px;"></div>
-        <div class="nav-controls">
-            <button onclick="prevItem('match')">back</button>
-            <button onclick="nextItem('match')">next</button>
+    <div class="container">
+        <div id="home" class="screen active-screen">
+            <h2 style="font-family: 'Klee One', cursive; color: var(--primary); font-size: 32px; margin: 0;">Hi Student! 👋</h2>
+            <div id="stars-total" class="instruction-text" style="color: var(--purple); font-weight: bold; font-size: 26px; margin-top: 5px;">🌟 0 Mastery Stars</div>
+            
+            <div class="instruction-text" style="font-size: 18px; margin-top: 15px; color: #888;">Tap the quote to hear it!</div>
+            <div class="quote-card" onclick="readQuoteOutLoud()">
+                <div id="motivational-quote" class="quote-text">Believe in yourself, you can do it!</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <button class="action-btn" style="background: var(--secondary); height: 100px;" onclick="showScreen('learn')">📖 LEARN</button>
+                    <button class="action-btn" style="background: var(--blue); height: 100px;" onclick="showScreen('spell')">✏️ SPELL</button>
+                    <button class="action-btn" style="background: var(--purple); height: 100px;" onclick="showScreen('match')">🧩 MATCH</button>
+                    <button class="action-btn" style="background: var(--primary); height: 100px;" onclick="showScreen('library')">📚 LIBRARY</button>
+                </div>
+                <button class="action-btn" style="background: #f1c40f; height: 100px; box-shadow: 0 5px 0 #d4ac0d;" onclick="showScreen('book')">🏆 STICKER BOOK</button>
+            </div>
+        </div>
+
+        <div id="learn" class="screen">
+            <div class="instruction-text">Tap the word to hear it spelled!</div>
+            <img id="learn-img" class="card-img" src="">
+            <div id="learn-word" class="big-word" onclick="handleLearnClick()">word</div>
+            <div style="display:flex; gap:15px; margin-top: 25px; width: 100%;">
+                <button class="action-btn" style="background:var(--accent); color:black; flex:1" onclick="prevItem('learn')">⬅️ PREV</button>
+                <button class="action-btn" style="background:var(--secondary); flex:1" onclick="nextItem('learn')">NEXT ➡️</button>
+            </div>
+        </div>
+
+        <div id="match" class="screen">
+            <div class="instruction-text">Which word matches the picture?</div>
+            <img id="match-img" class="card-img" src="">
+            <div id="match-options" style="width:100%; margin-top:30px;"></div>
+            <button class="action-btn" style="background:var(--accent); color:black; margin-top:15px; width:100%" onclick="prevItem('match')">⬅️ GO BACK</button>
+        </div>
+
+        <div id="spell" class="screen">
+            <div class="instruction-text">Tap letters to spell the word!</div>
+            <img id="spell-img" class="card-img" src="">
+            <div id="spell-slots" style="margin: 25px 0;"></div>
+            <div id="letter-pool" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px;"></div>
+            <div style="display:flex; gap:15px; margin-top: 30px; width: 100%;">
+                <button class="action-btn" style="background:var(--accent); color:black; flex:1" onclick="prevItem('spell')">⬅️ PREV</button>
+                <button class="action-btn" style="background:var(--delete); flex:1" onclick="handleBackspace()">⌫ DELETE</button>
+            </div>
+        </div>
+
+        <div id="library" class="screen">
+            <div class="instruction-text">Hold a word to see its picture!</div>
+            <div class="grid" id="library-grid"></div>
+        </div>
+
+        <div id="book" class="screen">
+            <div class="instruction-text">Stars show how many times you mastered it!</div>
+            <div class="grid" id="book-grid"></div>
         </div>
     </div>
 
-    <div id="spell" class="screen">
-        <img id="spell-img" class="card-img" src="">
-        <div id="spell-slots" style="margin: 20px 0;"></div>
-        <div id="letter-pool-container" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; align-items: center;">
-            <div id="letter-pool" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"></div>
-            <button id="backspace" class="backspace-btn" onclick="handleBackspace()">⌫</button>
-        </div>
-        <div class="nav-controls">
-            <button onclick="prevItem('spell')">back</button>
-            <button onclick="resetSpell()">restart</button>
-            <button onclick="nextItem('spell')">next</button>
-        </div>
+    <div class="nav-bar">
+        <div class="nav-item active" id="nav-home" onclick="showScreen('home')"><i>🏠</i>Home</div>
+        <div class="nav-item" id="nav-learn" onclick="showScreen('learn')"><i>📖</i>Learn</div>
+        <div class="nav-item" id="nav-spell" onclick="showScreen('spell')"><i>✏️</i>Spell</div>
+        <div class="nav-item" id="nav-match" onclick="showScreen('match')"><i>🧩</i>Match</div>
+        <div class="nav-item" id="nav-lib" onclick="showScreen('library')"><i>📚</i>Lib</div>
+        <div class="nav-item" id="nav-book" onclick="showScreen('book')"><i>🏆</i>Book</div>
     </div>
-
-    <div id="library" class="screen">
-        <h2 style="font-weight: 400; color: var(--gray); font-size: 18px;">word library (hold to peek)</h2>
-        <div id="library-grid" class="grid"></div>
-    </div>
-
-    <div id="book" class="screen">
-        <h2 style="font-weight: 400; color: var(--gray); font-size: 18px;">my stickers</h2>
-        <div id="book-grid" class="grid"></div>
-        <button onclick="clearProgress()" style="margin-top:30px; background:none; border:none; color:#ccc; text-decoration:underline; font-size:12px;">reset progress</button>
-    </div>
-</div>
 
 <script>
-    // Word List and Data Initialization
-       let wordList = [
-//    { word: 'cake', img: 'https://img.freepik.com/premium-vector/delicious-cake-clipart-vector-art-illustration_761413-18518.jpg?w=400', earned: false },
-//    { word: 'milk', img: 'https://thumb.ac-illust.com/c2/c29d5122113fb72d9178ad85e1e854c3_t.jpeg?w=400', earned: false },
-//    { word: 'bread', img: 'https://img.freepik.com/premium-vector/isolated-loaf-bread-slice-illustration_1274264-15470.jpg?w=400', earned: false },
-//    { word: 'butter', img: 'https://img.freepik.com/premium-vector/impressao_753212-2904.jpg?w=400', earned: false },
-//    { word: 'sandwich', img: 'https://img.freepik.com/premium-vector/kids-drawing-vector-illustration-cartoon-sandwich-icon-isolated-white_760559-3160.jpg?w=400', earned: false },
-
-      { word: 'food', img: 'https://img.freepik.com/premium-photo/authentic-chinese-food-photo-spring-rolls-noodles-dumplings-rice_1088041-52973.jpg?semt=ais_hybrid&w=400', earned: false },
-      { word: 'rice', img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?semt=ais_hybrid&w=400', earned: false },
-      { word: 'soup', img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', earned: false },
-      { word: 'porridge', img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', earned: false },
-      { word: 'noodle', img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?semt=ais_hybrid&w=400', earned: false },
-
-      { word: 'jelly', img: 'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?semt=ais_hybrid&w=400', earned: false },     
-//    { word: 'biscuit', img: 'https://img.freepik.com/free-vector/biscuit-cookies-cracker-with-cream-vector_1441-775.jpg?semt=ais_hybrid&w=400', earned: false },
-//    { word: 'cheese', img: 'https://img.freepik.com/premium-vector/cheese-board-cheese-dices-slices-vector-art_1290085-8070.jpg?semt=ais_hybrid&w=400', earned: false },
-      { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?semt=ais_hybrid&w=400', earned: false }
-//    { word: 'chocolate', img: 'https://img.freepik.com/premium-vector/chocolate-opened-package-white-background_269543-2547.jpg?semt=ais_user_personalization&w=400', earned: false },
-//    { word: 'mango', img: 'https://img.freepik.com/free-vector/whole-mango-cut-pieces-3d-illustration-cartoon-drawing-yellow-tasty-fruit-natural-food-product-with-vitamins-3d-style-white-background-food-fruits-healthy-eating-concept_778687-1633.jpg?semt=ais_hybrid&w=400', earned: false },
-//    { word: 'grapes', img: 'https://img.freepik.com/premium-vector/picture-bunch-grapes-with-green-leaf_909058-7592.jpg?semt=ais_hybrid&w=400', earned: false },
-//    { word: 'banana', img: 'https://img.freepik.com/free-vector/vector-ripe-yellow-banana-bunch-isolated-white-background_1284-45456.jpg?semt=ais_hybrid&w=400', earned: false },
-//    { word: 'pineapple', img: 'https://img.freepik.com/premium-photo/large-fresh-ripe-fruit-pineapple-fruit-summer_262193-1325.jpg?semt=ais_hybrid&w=400', earned: false },
-//    { word: 'papaya', img: 'https://img.freepik.com/premium-vector/papaya-isolated-white-background_1291186-77.jpg?semt=ais_hybrid&w=400', earned: false }
+    // 1. AT LEAST 10 QUOTES
+    const quotes = [
+        "Believe in yourself, you can do it!",
+        "Every small step counts toward success!",
+        "Mistakes help us learn and grow bigger!",
+        "You are doing a fantastic job today!",
+        "Keep trying, you are a spelling superstar!",
+        "You are smarter than you think!",
+        "Success is a series of small steps!",
+        "You make learning look easy and fun!",
+        "Your brain is getting stronger every minute!",
+        "Be brave, be curious, and keep going!",
+        "You have the power to do great things!",
+        "Today is a wonderful day to learn something new!"
     ];
 
+    let wordList = [
+      { word: 'food', img: 'https://img.freepik.com/premium-photo/authentic-chinese-food-photo-spring-rolls-noodles-dumplings-rice_1088041-52973.jpg?w=400', count: 0 },
+      { word: 'rice', img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?w=400', count: 0 },
+      { word: 'soup', img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', count: 0 },
+      { word: 'porridge', img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', count: 0 },
+      { word: 'noodle', img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?w=400', count: 0 },
+      { word: 'jelly', img: 'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?w=400', count: 0 },
+      { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?w=400', count: 0 }
+    ];
 
-    let learnList = [...wordList].sort(() => 0.5 - Math.random());
-    let matchList = [...wordList].sort(() => 0.5 - Math.random());
-    let spellList = [...wordList].sort(() => 0.5 - Math.random());
+    // RANDOMISE WORD SEQUENCE ON START
+    wordList.sort(() => 0.5 - Math.random());
 
     let learnIdx = 0, matchIdx = 0, spellIdx = 0, spellInput = "", pressTimer;
+    let totalStars = parseInt(localStorage.getItem('engTotalStars')) || 0;
 
-    // Fullscreen Logic
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => console.log(err));
-        } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-        }
+    function setRandomQuote() {
+        document.getElementById('motivational-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
     }
 
-    // Reward Logic (Confetti + Sound)
-    function launchConfetti() {
-        const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F43', '#A29BFE'];
-        for(let i=0; i<50; i++) {
-            const c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = Math.random() * 100 + 'vw';
-            c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            c.style.width = Math.random() * 8 + 5 + 'px';
-            c.style.height = c.style.width;
-            c.style.animationDuration = Math.random() * 2 + 1 + 's';
-            c.style.opacity = Math.random();
-            document.body.appendChild(c);
-            setTimeout(() => c.remove(), 3000);
-        }
-    }
-
-    function playDing() {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
-        osc.start(); osc.stop(audioCtx.currentTime + 1);
-    }
-
-    // Core Navigation & UI
-    function updateStickerBar() {
-        document.getElementById('sticker-bar').innerHTML = wordList.map(w => `
-            <div class="sticker-slot ${w.earned ? 'earned' : ''}" style="${w.earned ? 'background-image:url('+w.img+')' : ''}"></div>
-        `).join('');
-    }
-
-    function earnSticker(word) {
-        const item = wordList.find(w => w.word === word);
-        if (item && !item.earned) { item.earned = true; updateStickerBar(); }
-        playDing(); launchConfetti();
+    function readQuoteOutLoud() {
+        const t = document.getElementById('motivational-quote').innerText;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(t);
+        u.lang = 'en-US';
+        u.rate = 0.8; // SLOW DOWN QUOTE SPEED
+        window.speechSynthesis.speak(u);
     }
 
     function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active-screen');
+        const navId = (id === 'library' ? 'nav-lib' : 'nav-' + id);
+        if(document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+        
         window.speechSynthesis.cancel();
+        if(id === 'home') setRandomQuote();
         if(id === 'learn') renderLearn();
         if(id === 'match') renderMatch();
         if(id === 'spell') renderSpell();
         if(id === 'library') renderLibrary();
-        if(id === 'book') renderStickerBook();
+        if(id === 'book') renderStickers();
+        document.getElementById('stars-total').innerText = `🌟 ${totalStars} Mastery Stars`;
     }
 
-    function speak(text, rate = 1.0) {
-        const msg = new SpeechSynthesisUtterance(text.toLowerCase());
-        msg.rate = rate; window.speechSynthesis.speak(msg);
+    function earnWordSuccess(word) {
+        const item = wordList.find(w => w.word === word);
+        item.count++;
+        totalStars++;
+        localStorage.setItem('engTotalStars', totalStars);
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        speak(word);
     }
 
-    // Module Renders
     function renderLearn() {
-        const item = learnList[learnIdx];
+        const item = wordList[learnIdx];
         document.getElementById('learn-img').src = item.img;
         document.getElementById('learn-word').innerText = item.word;
     }
+    async function handleLearnClick() { await spellSequence(wordList[learnIdx].word); }
 
-    async function handleLearnClick() { await spellOutSequence(learnList[learnIdx].word); }
-
-    async function spellOutSequence(word) {
-        window.speechSynthesis.cancel(); speak(word);
-        await new Promise(r => setTimeout(r, 1200)); 
-        for (let char of word) { speak(char, 0.8); await new Promise(r => setTimeout(r, 900)); }
+    async function spellSequence(word) {
+        window.speechSynthesis.cancel();
+        speak(word);
+        await new Promise(r => setTimeout(r, 1200));
+        for(let char of word) { 
+            speak(char); 
+            // REDUCED PAUSE BETWEEN LETTERS (600ms)
+            await new Promise(r => setTimeout(r, 600)); 
+        }
         speak(word);
     }
 
     function renderMatch() {
-        const correct = matchList[matchIdx];
+        const correct = wordList[matchIdx];
         document.getElementById('match-img').src = correct.img;
+        const container = document.getElementById('match-options'); container.innerHTML = '';
         let options = [...wordList].sort(() => 0.5 - Math.random()).slice(0, 3);
         if(!options.find(o => o.word === correct.word)) options[0] = correct;
-        const container = document.getElementById('match-options');
-        container.innerHTML = '';
         options.sort(() => 0.5 - Math.random()).forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'letter-btn'; btn.style.width = 'auto'; btn.style.padding = '10px 15px';
-            btn.innerText = opt.word;
+            btn.className = 'match-btn'; btn.innerText = opt.word;
             btn.onclick = () => {
                 if(opt.word === correct.word) {
-                    earnSticker(correct.word); speak(correct.word);
-                    setTimeout(() => nextItem('match'), 1500);
-                } else { speak("no", 1.2); }
+                    earnWordSuccess(opt.word);
+                    setTimeout(() => { matchIdx = (matchIdx + 1) % wordList.length; renderMatch(); }, 1800);
+                } else { speak("Try again"); }
             };
             container.appendChild(btn);
         });
     }
 
     function renderSpell() {
-        const item = spellList[spellIdx];
+        const item = wordList[spellIdx];
         document.getElementById('spell-img').src = item.img;
-        resetSpell();
-    }
-
-    function resetSpell() {
         spellInput = "";
-        const currentWord = spellList[spellIdx].word;
-        document.getElementById('spell-slots').innerHTML = currentWord.split('').map(() => `<div class="slot"></div>`).join('');
-        const pool = document.getElementById('letter-pool');
-        pool.innerHTML = '';
-        currentWord.split('').sort(() => 0.5 - Math.random()).forEach(l => {
+        document.getElementById('spell-slots').innerHTML = item.word.split('').map(() => `<div class="slot"></div>`).join('');
+        const pool = document.getElementById('letter-pool'); pool.innerHTML = '';
+        item.word.split('').sort(() => 0.5 - Math.random()).forEach(l => {
             const btn = document.createElement('button');
             btn.className = 'letter-btn'; btn.innerText = l;
             btn.onclick = () => {
                 const slots = document.querySelectorAll('.slot');
-                if(spellInput.length < currentWord.length) {
+                if(spellInput.length < item.word.length) {
                     slots[spellInput.length].innerText = l;
-                    spellInput += l; speak(l, 1.3);
-                    if(spellInput === currentWord) {
-                        earnSticker(currentWord); speak(currentWord);
-                        setTimeout(() => nextItem('spell'), 1800);
+                    spellInput += l; speak(l);
+                    if(spellInput === item.word) {
+                        earnWordSuccess(item.word);
+                        setTimeout(() => { spellIdx = (spellIdx + 1) % wordList.length; renderSpell(); }, 1800);
                     }
                 }
             };
@@ -484,77 +305,52 @@
         });
     }
 
-    function handleBackspace() {
-        if (spellInput.length > 0) {
-            const slots = document.querySelectorAll('.slot');
-            spellInput = spellInput.slice(0, -1);
-            slots[spellInput.length].innerText = "";
-            speak("back", 1.5);
-        }
-    }
-
     function renderLibrary() {
         const grid = document.getElementById('library-grid');
         grid.innerHTML = wordList.map(w => `
-            <div class="lib-item" onclick="speak('${w.word}')" 
-                 onmousedown="startPress('${w.word}')" onmouseup="cancelPress()" 
-                 ontouchstart="startPress('${w.word}')" ontouchend="cancelPress()">
+            <div class="lib-card" 
+                 onmousedown="startPeek('${w.word}')" onmouseup="stopPeek()" 
+                 ontouchstart="startPeek('${w.word}')" ontouchend="stopPeek()">
                 ${w.word}
             </div>
         `).join('');
     }
+    function startPeek(word) { pressTimer = setTimeout(() => showPopup(word), 500); }
+    function stopPeek() { clearTimeout(pressTimer); }
 
-    function startPress(word) { pressTimer = setTimeout(() => showLibPopup(word), 600); }
-    function cancelPress() { clearTimeout(pressTimer); }
-
-    async function showLibPopup(wordText) {
+    function showPopup(wordText) {
         const item = wordList.find(w => w.word === wordText);
-        if (!item) return;
+        document.getElementById('pop-img').src = item.img;
+        document.getElementById('pop-word').innerText = item.word;
         document.getElementById('lib-popup').style.display = 'flex';
-        document.getElementById('popup-img').src = item.img;
-        document.getElementById('popup-word').innerText = item.word;
-        document.getElementById('replay-btn').onclick = () => spellOutSequence(item.word);
-        await spellOutSequence(item.word);
+        spellSequence(item.word);
     }
+    function closePopup() { document.getElementById('lib-popup').style.display = 'none'; window.speechSynthesis.cancel(); }
+    function replayPopSequence() { spellSequence(document.getElementById('pop-word').innerText); }
 
-    function closeLibPopup() {
-        window.speechSynthesis.cancel();
-        document.getElementById('lib-popup').style.display = 'none';
-    }
-
-    function renderStickerBook() {
-        document.getElementById('book-grid').innerHTML = wordList.map(w => `
-            <div class="sticker-page-item ${w.earned ? '' : 'locked'}">
-                <img class="sticker-img" src="${w.img}"><div style="font-size:12px; margin-top:5px;">${w.earned ? w.word : '???'}</div>
+    function renderStickers() {
+        const grid = document.getElementById('book-grid');
+        grid.innerHTML = wordList.map(w => `
+            <div class="sticker-slot ${w.count > 0 ? 'unlocked' : ''}">
+                ${w.count > 0 ? `<div class="star-badge">🌟 ${w.count}</div>` : ''}
+                <img class="sticker-img" src="${w.img}" style="filter: ${w.count > 0 ? 'none' : 'grayscale(1) opacity(0.2)'}">
+                <div style="margin-top:10px; font-weight:bold; color:#444; font-size:18px;">${w.count > 0 ? w.word : '???'}</div>
             </div>
         `).join('');
     }
 
-    function clearProgress() {
-        if(confirm("Start over?")) {
-            wordList.forEach(w => w.earned = false);
-            updateStickerBar();
-            if(document.getElementById('book').classList.contains('active')) renderStickerBook();
-        }
-    }
-
-    function nextItem(m) { 
-        if(m==='learn') { learnIdx=(learnIdx+1)%learnList.length; renderLearn(); }
-        if(m==='match') { matchIdx=(matchIdx+1)%matchList.length; renderMatch(); }
-        if(m==='spell') { spellIdx=(spellIdx+1)%spellList.length; renderSpell(); }
-    }
-    
+    function handleBackspace() { if (spellInput.length > 0) { spellInput = spellInput.slice(0, -1); document.querySelectorAll('.slot')[spellInput.length].innerText = ""; }}
+    function nextItem(m) { if(m==='learn') { learnIdx=(learnIdx+1)%wordList.length; renderLearn(); } }
     function prevItem(m) { 
-        if(m==='learn') { learnIdx=(learnIdx-1+learnList.length)%learnList.length; renderLearn(); }
-        if(m==='match') { matchIdx=(matchIdx-1+matchList.length)%matchList.length; renderMatch(); }
-        if(m==='spell') { spellIdx=(spellIdx-1+spellList.length)%spellList.length; renderSpell(); }
+        if(m==='learn') { learnIdx=(learnIdx-1+wordList.length)%wordList.length; renderLearn(); }
+        if(m==='match') { matchIdx=(matchIdx-1+wordList.length)%wordList.length; renderMatch(); }
+        if(m==='spell') { spellIdx=(spellIdx-1+wordList.length)%wordList.length; renderSpell(); }
     }
+    function speak(t) { const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; window.speechSynthesis.speak(u); }
+    function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 
-    updateStickerBar();
-    renderLearn();
+    setRandomQuote();
+    showScreen('home');
 </script>
 </body>
 </html>
-
-
-
