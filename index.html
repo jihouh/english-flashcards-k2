@@ -26,76 +26,73 @@
         }
 
         .header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg); }
-        h1 { font-size: clamp(18px, 4vw, 24px); color: var(--primary); margin: 0; font-family: 'Klee One', cursive; font-weight: 600; }
-        .fullscreen-btn { background: #eee; color: #666; font-size: 13px; padding: 8px 12px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; font-weight: bold; }
+        h1 { font-size: clamp(18px, 4vw, 28px); color: var(--primary); margin: 0; font-family: 'Klee One', cursive; font-weight: 600; }
+        .fullscreen-btn { background: #eee; color: #666; font-size: clamp(11px, 2vw, 15px); padding: 8px 12px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; font-weight: bold; }
 
         .nav-bar {
             position: fixed; bottom: 0; width: 100%; background: white; 
-            display: flex; justify-content: space-around; padding: 15px 0;
+            display: flex; justify-content: space-around; padding: clamp(10px, 2vw, 20px) 0;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 100;
         }
         .nav-item { font-family: 'Klee One', cursive; font-weight: bold; color: #888; cursor: pointer; font-size: clamp(14px, 2.5vw, 18px); text-align: center; flex: 1; }
-        .nav-item i { display: block; font-size: clamp(22px, 5vw, 30px); margin-bottom: 4px; font-style: normal; }
+        .nav-item i { display: block; font-size: clamp(22px, 5vw, 32px); margin-bottom: 4px; font-style: normal; }
         .nav-item.active { color: var(--primary); }
 
-        .instruction-text { font-family: 'Klee One', cursive; color: var(--gray); font-size: clamp(18px, 4vw, 26px); margin-bottom: 10px; text-align: center; padding: 0 10px; font-weight: 600; }
-
         .container { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 20px 120px 20px; overflow-y: auto; }
-        .screen { display: none; width: 100%; max-width: 800px; animation: fadeIn 0.3s; } /* Increased max-width for tablets */
+        .screen { display: none; width: 100%; max-width: 800px; animation: fadeIn 0.3s; }
         .active-screen { display: flex; flex-direction: column; align-items: center; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .quote-card {
-            background: white; width: 100%; padding: 20px; border-radius: 20px;
-            border: 2px solid var(--shadow); box-shadow: 0 4px 10px var(--shadow);
-            margin: 15px 0; text-align: center; cursor: pointer;
-        }
-        .quote-text { font-family: 'Klee One', cursive; color: var(--purple); font-size: clamp(18px, 3.5vw, 24px); font-weight: bold; line-height: 1.4; }
+        /* HOME SCREEN */
+        .welcome-text { font-family: 'Klee One', cursive; color: var(--primary); font-size: clamp(28px, 6vw, 42px); margin: 0; text-align: center; }
+        .stars-display { font-family: 'Klee One', cursive; color: var(--purple); font-weight: bold; font-size: clamp(20px, 4vw, 32px); margin-top: 5px; text-align: center; }
+        .quote-card { background: white; width: 100%; max-width: 600px; padding: 20px; border-radius: 25px; border: 3px solid var(--shadow); margin: 20px 0; text-align: center; cursor: pointer; }
+        .quote-text { font-family: 'Klee One', cursive; color: var(--purple); font-size: clamp(18px, 3.5vw, 26px); font-weight: bold; }
 
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 600px; }
         button.action-btn { 
-            padding: 15px 10px; border-radius: 20px; border: none; color: white; 
+            padding: 15px 10px; border-radius: 25px; border: none; color: white; 
             font-weight: 900; cursor: pointer; font-family: 'Klee One', cursive; 
-            box-shadow: 0 5px 0 rgba(0,0,0,0.1); font-size: clamp(18px, 3vw, 24px); text-transform: uppercase;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.1); font-size: clamp(18px, 4vw, 26px);
+            height: clamp(80px, 15vw, 130px);
         }
 
-        .card-img { width: 100%; max-width: 400px; height: auto; max-height: 30vh; object-fit: contain; border-radius: 25px; background: white; padding: 15px; border: 5px solid var(--secondary); box-shadow: 0 8px 0px var(--shadow); }
-        .big-word { font-size: clamp(3rem, 12vw, 6rem); color: var(--primary); margin: 20px 0; font-family: 'Comic Neue', cursive; font-weight: bold; cursor: pointer; }
+        .instruction-text { font-family: 'Klee One', cursive; color: var(--gray); font-size: clamp(18px, 4vw, 26px); margin-bottom: 15px; text-align: center; font-weight: 600; }
+        .card-img { width: 100%; max-width: 400px; height: auto; max-height: 25vh; object-fit: contain; border-radius: 25px; background: white; padding: 10px; border: 5px solid var(--secondary); box-shadow: 0 8px 0px var(--shadow); }
 
-        /* SCALED MATCH MODULE */
-        .match-btn {
-            width: 100%; max-width: 500px; background: #ffffff; color: #222; 
-            font-size: clamp(24px, 6vw, 40px); font-weight: 800; padding: clamp(15px, 4vw, 30px); 
-            border-radius: 25px; border: 4px solid var(--accent);
-            box-shadow: 0 8px 0px var(--accent); margin-bottom: clamp(10px, 3vw, 20px);
-            font-family: 'Comic Neue', cursive; cursor: pointer;
-            transition: transform 0.1s;
+        /* SPELLING ROW LOGIC */
+        .spell-row { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: nowrap; 
+            gap: clamp(4px, 1vw, 10px); 
+            margin-bottom: 15px;
+            width: 100%;
         }
-        .match-btn:active { transform: translateY(4px); box-shadow: 0 4px 0px var(--accent); }
-
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 3vw, 20px); width: 100%; }
-        .lib-card { background: white; color: black; border: 3px solid var(--light-gray); height: clamp(80px, 15vw, 130px); display: flex; align-items: center; justify-content: center; font-size: clamp(24px, 5vw, 36px); font-family: 'Comic Neue', cursive; font-weight: bold; border-radius: 20px; box-shadow: 0 5px 0 #ddd; cursor: pointer; }
         
-        .sticker-slot { position: relative; background: white; border: 3px dashed #ccc; border-radius: 20px; padding: 12px; text-align: center; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .sticker-slot.unlocked { border: 3px solid var(--accent); background: #fffdf5; }
-        .sticker-img { width: clamp(60px, 12vw, 100px); height: clamp(60px, 12vw, 100px); object-fit: contain; }
-        .star-badge { position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
-
-        /* SCALED SPELLING SLOTS & LETTERS */
-        .slot { width: clamp(40px, 10vw, 70px); height: clamp(50px, 12vw, 80px); border-bottom: 5px solid var(--secondary); display: inline-block; margin: 0 6px; font-size: clamp(2rem, 8vw, 3.5rem); color: var(--primary); text-align: center; font-family: 'Comic Neue'; font-weight: bold; }
-        .letter-btn { 
-            width: clamp(60px, 14vw, 90px); 
-            height: clamp(60px, 14vw, 90px); 
-            background: var(--blue); border: none; border-radius: 18px; 
-            box-shadow: 0 5px 0px #348ecc; 
-            font-size: clamp(1.8rem, 6vw, 3rem); 
-            font-family: 'Comic Neue', cursive; cursor: pointer; font-weight: bold; color: white; 
+        .slot { 
+            width: clamp(28px, 8vw, 70px); 
+            height: clamp(45px, 11vw, 85px); 
+            border-bottom: 5px solid var(--secondary); 
+            font-size: clamp(1.8rem, 7vw, 3.5rem); 
+            color: var(--primary); 
+            text-align: center; 
+            font-family: 'Comic Neue'; 
+            font-weight: bold; 
         }
-        .letter-btn:active { transform: translateY(4px); box-shadow: 0 1px 0px #348ecc; }
 
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
-        .popup-card { background: white; padding: 35px; border-radius: 35px; width: 90%; max-width: 400px; text-align: center; position: relative; }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; font-size: 24px; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; }
+        .letter-btn { 
+            width: clamp(55px, 13vw, 90px); 
+            height: clamp(55px, 13vw, 90px); 
+            background: var(--blue); border: none; border-radius: 18px; 
+            box-shadow: 0 5px 0px #348ecc; font-size: clamp(1.8rem, 6vw, 3rem); 
+            font-family: 'Comic Neue', cursive; cursor: pointer; color: white; 
+        }
+
+        .match-btn { width: 100%; max-width: 500px; background: white; font-size: clamp(24px, 5vw, 38px); padding: 20px; border-radius: 25px; border: 4px solid var(--accent); box-shadow: 0 8px 0px var(--accent); margin-bottom: 15px; font-family: 'Comic Neue'; font-weight: 800; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
+        .lib-card { background: white; border: 3px solid var(--light-gray); height: 100px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-family: 'Comic Neue'; font-weight: bold; border-radius: 20px; box-shadow: 0 5px 0 #ddd; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -105,67 +102,51 @@
         <button class="fullscreen-btn" onclick="toggleFullscreen()">🖥️ FULLSCREEN</button>
     </div>
 
-    <div id="lib-popup" class="overlay">
-        <div class="popup-card">
-            <button class="close-btn" onclick="closePopup()">✖</button>
-            <img id="pop-img" src="" class="card-img" style="max-height: 180px;">
-            <div id="pop-word" class="big-word">word</div>
-            <button class="action-btn" style="background: var(--secondary); width: 100%;" onclick="replayPopSequence()">🔊 SPELL AGAIN</button>
-        </div>
-    </div>
-
     <div class="container">
         <div id="home" class="screen active-screen">
-            <h2 style="font-family: 'Klee One', cursive; color: var(--primary); font-size: clamp(24px, 5vw, 36px); margin: 0;">Hi Student! 👋</h2>
-            <div id="stars-total" class="instruction-text" style="color: var(--purple); font-weight: bold; margin-top: 5px;">🌟 0 Mastery Stars</div>
-            
-            <div class="instruction-text" style="font-size: clamp(14px, 2.5vw, 18px); margin-top: 15px; color: #888;">Tap the quote to hear it!</div>
+            <h2 class="welcome-text">Hi Student! 👋</h2>
+            <div id="stars-total" class="stars-display">🌟 0 Mastery Stars</div>
             <div class="quote-card" onclick="readQuoteOutLoud()">
                 <div id="motivational-quote" class="quote-text">Believe in yourself!</div>
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <button class="action-btn" style="background: var(--secondary); height: clamp(80px, 15vw, 120px);" onclick="showScreen('learn')">📖 LEARN</button>
-                    <button class="action-btn" style="background: var(--blue); height: clamp(80px, 15vw, 120px);" onclick="showScreen('spell')">✏️ SPELL</button>
-                    <button class="action-btn" style="background: var(--purple); height: clamp(80px, 15vw, 120px);" onclick="showScreen('match')">🧩 MATCH</button>
-                    <button class="action-btn" style="background: var(--primary); height: clamp(80px, 15vw, 120px);" onclick="showScreen('library')">📚 LIBRARY</button>
-                </div>
-                <button class="action-btn" style="background: #f1c40f; height: clamp(80px, 15vw, 120px); box-shadow: 0 5px 0 #d4ac0d;" onclick="showScreen('book')">🏆 STICKER BOOK</button>
+            <div class="home-grid">
+                <button class="action-btn" style="background: var(--secondary);" onclick="showScreen('learn')">📖 LEARN</button>
+                <button class="action-btn" style="background: var(--blue);" onclick="showScreen('spell')">✏️ SPELL</button>
+                <button class="action-btn" style="background: var(--purple);" onclick="showScreen('match')">🧩 MATCH</button>
+                <button class="action-btn" style="background: var(--primary);" onclick="showScreen('library')">📚 LIBRARY</button>
+                <button class="action-btn" style="background: #f1c40f; grid-column: span 2;" onclick="showScreen('book')">🏆 STICKER BOOK</button>
             </div>
         </div>
 
         <div id="learn" class="screen">
             <div class="instruction-text">Tap the word to hear it spelled!</div>
             <img id="learn-img" class="card-img" src="">
-            <div id="learn-word" class="big-word" onclick="handleLearnClick()">word</div>
-            <div style="display:flex; gap:15px; margin-top: 25px; width: 100%;">
+            <div id="learn-word" style="font-size: clamp(3rem, 10vw, 5rem); color: var(--primary); font-family: 'Comic Neue'; font-weight: bold; margin: 20px 0; cursor: pointer;" onclick="handleLearnClick()">word</div>
+            <div style="display:flex; gap:15px; width: 100%; max-width: 500px;">
                 <button class="action-btn" style="background:var(--accent); color:black; flex:1" onclick="prevItem('learn')">⬅️ PREV</button>
                 <button class="action-btn" style="background:var(--secondary); flex:1" onclick="nextItem('learn')">NEXT ➡️</button>
             </div>
         </div>
 
-        <div id="match" class="screen">
-            <div class="instruction-text">Which word matches the picture?</div>
-            <div style="width: 100%; display: flex; justify-content: center;">
-                <img id="match-img" class="card-img" src="">
-            </div>
-            <div id="match-options" style="width:100%; margin-top:30px; display: flex; flex-direction: column; align-items: center;"></div>
-            <button class="action-btn" style="background:var(--accent); color:black; margin-top:15px; width:100%; max-width: 500px;" onclick="prevItem('match')">⬅️ GO BACK</button>
-        </div>
-
         <div id="spell" class="screen">
             <div class="instruction-text">Tap letters to spell the word!</div>
             <img id="spell-img" class="card-img" src="">
-            <div id="spell-slots" style="margin: 25px 0; display: flex; justify-content: center; flex-wrap: wrap;"></div>
-            <div id="letter-pool" style="display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(10px, 2.5vw, 20px); width: 100%;"></div>
+            <div id="spell-container" style="margin: 25px 0; width: 100%;"></div>
+            <div id="letter-pool" style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; width: 100%;"></div>
             <div style="display:flex; gap:15px; margin-top: 30px; width: 100%; max-width: 500px;">
                 <button class="action-btn" style="background:var(--accent); color:black; flex:1" onclick="prevItem('spell')">⬅️ PREV</button>
                 <button class="action-btn" style="background:var(--delete); flex:1" onclick="handleBackspace()">⌫ DELETE</button>
             </div>
         </div>
 
-        <div id="library" class="screen"><div class="instruction-text">Hold a word to see its picture!</div><div class="grid" id="library-grid"></div></div>
+        <div id="match" class="screen">
+            <div class="instruction-text">Which word matches the picture?</div>
+            <img id="match-img" class="card-img" src="">
+            <div id="match-options" style="width:100%; margin-top:30px; display: flex; flex-direction: column; align-items: center;"></div>
+            <button class="action-btn" style="background:var(--accent); color:black; margin-top:15px; width:100%; max-width: 500px;" onclick="prevItem('match')">⬅️ GO BACK</button>
+        </div>
+
+        <div id="library" class="screen"><div class="instruction-text">Tap a word!</div><div class="grid" id="library-grid"></div></div>
         <div id="book" class="screen"><div class="instruction-text">My Collection!</div><div class="grid" id="book-grid"></div></div>
     </div>
 
@@ -179,20 +160,37 @@
     </div>
 
 <script>
-    const quotes = ["Believe in yourself!", "Every small step counts!", "Mistakes help us learn!", "You are doing great!", "You are a spelling superstar!", "You are smarter than you think!", "Keep going!", "You make learning fun!", "Your brain is getting stronger!", "Be brave and curious!", "You can do great things!", "Today is a great day to learn!"];
-    let wordList = [{word:'food',img:'https://img.freepik.com/premium-photo/authentic-chinese-food-photo-spring-rolls-noodles-dumplings-rice_1088041-52973.jpg?w=400',count:0},{word:'rice',img:'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?w=400',count:0},{word:'soup',img:'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg',count:0},{word:'porridge',img:'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg',count:0},{word:'noodle',img:'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?w=400',count:0},{word:'jelly',img:'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?w=400',count:0},{word:'ice cream',img:'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?w=400',count:0}];
+    /* =========================================
+       WORD LIST: EDIT EACH ROW BELOW
+       ========================================= */
+    let wordList = [
+        { word: 'food',      img: 'https://img.freepik.com/premium-photo/authentic-chinese-food-photo-spring-rolls-noodles-dumplings-rice_1088041-52973.jpg?w=400', count: 0 },
+        { word: 'rice',      img: 'https://img.freepik.com/premium-vector/bowl-full-rice-vector-illustration_621660-2012.jpg?w=400', count: 0 },
+        { word: 'soup',      img: 'https://img.freepik.com/premium-vector/pumpkin-soup-bowl-isolated-white-background-traditional-autumn-thanksgiving-food-vector-illustration_693602-124.jpg', count: 0 },
+        { word: 'porridge',  img: 'https://img.freepik.com/premium-photo/traditional-chinese-porridge-rice-gruel-bowl_45583-882.jpg', count: 0 },
+        { word: 'noodle',    img: 'https://img.freepik.com/premium-vector/hakka-noodles-vector-illustration_621660-3511.jpg?w=400', count: 0 },
+        { word: 'jelly',     img: 'https://img.freepik.com/premium-vector/cartoon-sweet-dessert-pink-jelly-plate-vector-illustration_87850-525.jpg?w=400', count: 0 },
+        { word: 'ice cream', img: 'https://img.freepik.com/free-vector/delicious-ice-cream-cones_1308-174629.jpg?w=400', count: 0 }
+    ];
+
+    const quotes = ["Believe in yourself!", "Every small step counts!", "Mistakes help us learn!", "You are a superstar!", "Keep going!", "Your brain is growing!", "You can do it!", "Fantastic work!", "Be brave!", "Learning is fun!"];
+    
+    // Randomize sequence on load
     wordList.sort(() => 0.5 - Math.random());
-    let learnIdx = 0, matchIdx = 0, spellIdx = 0, spellInput = "", pressTimer;
+    
+    let learnIdx = 0, matchIdx = 0, spellIdx = 0, spellInput = "";
     let totalStars = parseInt(localStorage.getItem('engTotalStars')) || 0;
 
     function setRandomQuote() { document.getElementById('motivational-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)]; }
     function readQuoteOutLoud() { const t = document.getElementById('motivational-quote').innerText; window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = 0.8; window.speechSynthesis.speak(u); }
+
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active-screen');
         const navId = (id === 'library' ? 'nav-lib' : 'nav-' + id);
         if(document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+        
         window.speechSynthesis.cancel();
         if(id === 'home') setRandomQuote();
         if(id === 'learn') renderLearn();
@@ -203,7 +201,49 @@
         document.getElementById('stars-total').innerText = `🌟 ${totalStars} Mastery Stars`;
     }
 
-    function earnWordSuccess(word) {
+    function renderSpell() {
+        const item = wordList[spellIdx];
+        document.getElementById('spell-img').src = item.img;
+        spellInput = "";
+        const container = document.getElementById('spell-container');
+        container.innerHTML = '';
+        
+        // Multi-row handling
+        const subWords = item.word.split(' ');
+        subWords.forEach(sub => {
+            const row = document.createElement('div');
+            row.className = 'spell-row';
+            sub.split('').forEach(() => {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                row.appendChild(slot);
+            });
+            container.appendChild(row);
+        });
+
+        // Letters without spaces
+        const poolLetters = item.word.replace(/\s/g, '').split('');
+        const pool = document.getElementById('letter-pool');
+        pool.innerHTML = '';
+        poolLetters.sort(() => 0.5 - Math.random()).forEach(l => {
+            const btn = document.createElement('button');
+            btn.className = 'letter-btn'; btn.innerText = l;
+            btn.onclick = () => {
+                const slots = document.querySelectorAll('.slot');
+                if(spellInput.length < poolLetters.length) {
+                    slots[spellInput.length].innerText = l;
+                    spellInput += l; speak(l);
+                    if(spellInput === item.word.replace(/\s/g, '')) {
+                        earnSuccess(item.word);
+                        setTimeout(() => { spellIdx = (spellIdx + 1) % wordList.length; renderSpell(); }, 1800);
+                    }
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function earnSuccess(word) {
         const item = wordList.find(w => w.word === word);
         item.count++; totalStars++;
         localStorage.setItem('engTotalStars', totalStars);
@@ -212,8 +252,16 @@
     }
 
     function renderLearn() { const item = wordList[learnIdx]; document.getElementById('learn-img').src = item.img; document.getElementById('learn-word').innerText = item.word; }
-    async function handleLearnClick() { await spellSequence(wordList[learnIdx].word); }
-    async function spellSequence(word) { window.speechSynthesis.cancel(); speak(word); await new Promise(r => setTimeout(r, 1200)); for(let char of word) { speak(char); await new Promise(r => setTimeout(r, 600)); } speak(word); }
+    async function handleLearnClick() { 
+        const word = wordList[learnIdx].word; 
+        window.speechSynthesis.cancel(); 
+        speak(word); 
+        await new Promise(r => setTimeout(r, 1200)); 
+        for(let char of word) { 
+            if(char !== ' ') { speak(char); await new Promise(r => setTimeout(r, 600)); }
+        } 
+        speak(word); 
+    }
 
     function renderMatch() {
         const correct = wordList[matchIdx];
@@ -224,42 +272,26 @@
         options.sort(() => 0.5 - Math.random()).forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'match-btn'; btn.innerText = opt.word;
-            btn.onclick = () => { if(opt.word === correct.word) { earnWordSuccess(opt.word); setTimeout(() => { matchIdx = (matchIdx + 1) % wordList.length; renderMatch(); }, 1800); } else { speak("Try again"); } };
+            btn.onclick = () => { if(opt.word === correct.word) { earnSuccess(opt.word); setTimeout(() => { matchIdx = (matchIdx + 1) % wordList.length; renderMatch(); }, 1800); } else { speak("Try again"); } };
             container.appendChild(btn);
         });
     }
 
-    function renderSpell() {
-        const item = wordList[spellIdx];
-        document.getElementById('spell-img').src = item.img;
-        spellInput = "";
-        document.getElementById('spell-slots').innerHTML = item.word.split('').map(() => `<div class="slot"></div>`).join('');
-        const pool = document.getElementById('letter-pool'); pool.innerHTML = '';
-        item.word.split('').sort(() => 0.5 - Math.random()).forEach(l => {
-            const btn = document.createElement('button');
-            btn.className = 'letter-btn'; btn.innerText = l;
-            btn.onclick = () => {
-                const slots = document.querySelectorAll('.slot');
-                if(spellInput.length < item.word.length) {
-                    slots[spellInput.length].innerText = l;
-                    spellInput += l; speak(l);
-                    if(spellInput === item.word) { earnWordSuccess(item.word); setTimeout(() => { spellIdx = (spellIdx + 1) % wordList.length; renderSpell(); }, 1800); }
-                }
-            };
-            pool.appendChild(btn);
-        });
+    function renderLibrary() { 
+        const grid = document.getElementById('library-grid'); 
+        grid.innerHTML = wordList.map(w => `<div class="lib-card" onclick="speak('${w.word}')">${w.word}</div>`).join(''); 
     }
 
-    function renderLibrary() {
-        const grid = document.getElementById('library-grid');
-        grid.innerHTML = wordList.map(w => `<div class="lib-card" onmousedown="startPeek('${w.word}')" onmouseup="stopPeek()" ontouchstart="startPeek('${w.word}')" ontouchend="stopPeek()">${w.word}</div>`).join('');
+    function renderStickers() { 
+        const grid = document.getElementById('book-grid'); 
+        grid.innerHTML = wordList.map(w => `
+            <div class="sticker-slot" style="background:white; border-radius:15px; padding:10px; border:2px solid #eee; text-align:center;">
+                <span style="font-size:14px; color:var(--purple); font-weight:bold;">${w.count > 0 ? '🌟 '+w.count : ''}</span><br>
+                <img src="${w.img}" style="width:65px; height:65px; object-fit:contain; filter:${w.count>0?'none':'grayscale(1) opacity(0.3)'}"><br>
+                <div style="font-weight:bold; font-size:16px;">${w.count>0?w.word:'???'}</div>
+            </div>`).join(''); 
     }
-    function startPeek(word) { pressTimer = setTimeout(() => showPopup(word), 500); }
-    function stopPeek() { clearTimeout(pressTimer); }
-    function showPopup(wordText) { const item = wordList.find(w => w.word === wordText); document.getElementById('pop-img').src = item.img; document.getElementById('pop-word').innerText = item.word; document.getElementById('lib-popup').style.display = 'flex'; spellSequence(item.word); }
-    function closePopup() { document.getElementById('lib-popup').style.display = 'none'; window.speechSynthesis.cancel(); }
-    function replayPopSequence() { spellSequence(document.getElementById('pop-word').innerText); }
-    function renderStickers() { const grid = document.getElementById('book-grid'); grid.innerHTML = wordList.map(w => `<div class="sticker-slot ${w.count > 0 ? 'unlocked' : ''}">${w.count > 0 ? `<div class="star-badge">🌟 ${w.count}</div>` : ''}<img class="sticker-img" src="${w.img}" style="filter: ${w.count > 0 ? 'none' : 'grayscale(1) opacity(0.2)'}"><div style="margin-top:10px; font-weight:bold; color:#444; font-size:18px;">${w.count > 0 ? w.word : '???'}</div></div>`).join(''); }
+
     function handleBackspace() { if (spellInput.length > 0) { spellInput = spellInput.slice(0, -1); document.querySelectorAll('.slot')[spellInput.length].innerText = ""; }}
     function nextItem(m) { if(m==='learn') { learnIdx=(learnIdx+1)%wordList.length; renderLearn(); } }
     function prevItem(m) { 
