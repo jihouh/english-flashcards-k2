@@ -88,6 +88,8 @@
         input:checked + .slider { background-color: var(--secondary); }
         input:checked + .slider:before { transform: translateX(20px); }
 
+        .admin-controls-btn { border: none; background: #f0f0f0; border-radius: 5px; cursor: pointer; padding: 5px; margin-left: 5px; font-size: 14px; }
+
         /* Library */
         .lib-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
         .lib-card { background: white; border: 3px solid var(--light-gray); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 25px; cursor: pointer; }
@@ -124,7 +126,7 @@
     <div class="header">
         <h1>Small Steps Spelling ✨</h1>
         <div class="header-controls">
-            <button class="admin-toggle-btn" onclick="showScreen('admin')">⚙️ PARENT</button>
+            <button class="admin-toggle-btn" onclick="checkAdminAccess()">⚙️ PARENT</button>
             <button class="fullscreen-btn" onclick="toggleFullscreen()">🖥️</button>
         </div>
     </div>
@@ -197,9 +199,9 @@
             </div>
             <div class="admin-box" style="border-color: #ff9f43;">
                 <h4 style="margin:0; color:#ff9f43">Progress & Data</h4>
-                <button class="action-btn" style="background:#ff9f43; height:45px; width:100%; font-size:14px;" onclick="resetProgress()">RESET ALL PROGRESS</button>
+                <button class="action-btn" style="background:#ff9f43; height:45px; width:100%; font-size:14px;" onclick="resetProgress()">RESET ALL PROGRESS & RELOAD</button>
             </div>
-            <button class="action-btn" style="background:var(--gray); height:60px; width:100%; margin-top: 10px;" onclick="showScreen('home')">CLOSE</button>
+            <button class="action-btn" style="background:var(--gray); height:60px; width:100%; margin-top: 10px;" onclick="showScreen('home')">LOGOUT</button>
         </div>
 
         <div id="learn" class="screen">
@@ -249,6 +251,7 @@
     </div>
 
 <script>
+    const DEFAULT_ADMIN_PASS = "1234";
     let defaultWords = [
         { word: 'toys', img: 'https://img.freepik.com/premium-vector/vector-illustration-kids-toys_29937-1394.jpg', count: 0, active: true },
         { word: 'games', img: 'https://img.freepik.com/free-vector/children-playing-games-sports-illustration_1308-2650.jpg', count: 0, active: true },
@@ -283,7 +286,7 @@
         "Awesome work today! 🎈"
     ];
 
-    let wordList = JSON.parse(localStorage.getItem('ss_wordlist')) || defaultWords;
+    let wordList = JSON.parse(localStorage.getItem('ss_wordlist')) || [...defaultWords];
     let userName = localStorage.getItem('ss_username') || "Student";
     let totalStars = parseInt(localStorage.getItem('engTotalStars')) || 0;
     let spellDifficulty = parseInt(localStorage.getItem('ss_difficulty')) || 50;
@@ -291,11 +294,18 @@
     let chTimeLimit = parseInt(localStorage.getItem('ss_ch_timer')) || 60;
     let chHighScore = parseInt(localStorage.getItem('ss_ch_high')) || 0;
     
-    // Challenge Stats
     let chInterval, chScore, chTimeLeft, chTaskType = "match";
     let chCorrectCount = 0, chWrongCount = 0, chPracticeWords = new Set();
-    
     let learnIdx=0, matchIdx=0, spellIdx=0, spellInput="", holdTimer;
+
+    function checkAdminAccess() {
+        const pass = prompt("Please enter Parent Password:");
+        if (pass === DEFAULT_ADMIN_PASS) {
+            showScreen('admin');
+        } else if (pass !== null) {
+            alert("Incorrect password!");
+        }
+    }
 
     function getActive() { 
         let active = wordList.filter(w => w.active);
@@ -334,8 +344,13 @@
         listContainer.innerHTML = wordList.map((w, i) => `
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 10px 0;"><label class="switch"><input type="checkbox" ${w.active?'checked':''} onchange="toggleWordActive(${i})"><span class="slider"></span></label></td>
-                <td style="font-weight:bold; font-family:'Comic Neue'; font-size: 18px;">${w.word}</td>
-                <td style="text-align:right;"><button onclick="deleteWord(${i})" style="color:red; border:none; background:none; font-size: 20px;">✕</button></td>
+                <td style="font-weight:bold; font-family:'Comic Neue'; font-size: 16px;">${w.word}</td>
+                <td style="text-align:right; min-width:120px;">
+                    <button class="admin-controls-btn" onclick="moveWord(${i}, -1)">▲</button>
+                    <button class="admin-controls-btn" onclick="moveWord(${i}, 1)">▼</button>
+                    <button class="admin-controls-btn" onclick="editWordImg(${i})">🔗</button>
+                    <button class="admin-controls-btn" onclick="deleteWord(${i})" style="color:red;">✕</button>
+                </td>
             </tr>
         `).join('');
         document.getElementById('name-input').value = userName;
@@ -345,6 +360,26 @@
         document.getElementById('ch-timer-slider').value = chTimeLimit;
         document.getElementById('ch-timer-val').innerText = `${chTimeLimit}s`;
     }
+
+    function moveWord(index, direction) {
+        const newIdx = index + direction;
+        if (newIdx < 0 || newIdx >= wordList.length) return;
+        const temp = wordList[index];
+        wordList[index] = wordList[newIdx];
+        wordList[newIdx] = temp;
+        save();
+        renderAdmin();
+    }
+
+    function editWordImg(index) {
+        const newUrl = prompt("Enter new image URL for '" + wordList[index].word + "':", wordList[index].img);
+        if (newUrl) {
+            wordList[index].img = newUrl;
+            save();
+            renderAdmin();
+        }
+    }
+
     function toggleWordActive(index) { wordList[index].active = !wordList[index].active; save(); }
     function deleteWord(index) { if(confirm("Delete?")) { wordList.splice(index, 1); save(); renderAdmin(); } }
     function updateName() { userName = document.getElementById('name-input').value; localStorage.setItem('ss_username', userName); alert("Saved!"); }
@@ -356,7 +391,13 @@
         const i = document.getElementById('new-word-img').value.trim();
         if(t && i) { wordList.push({word:t, img:i, count:0, active:true}); save(); renderAdmin(); document.getElementById('new-word-text').value=''; document.getElementById('new-word-img').value=''; }
     }
-    function resetProgress() { if(confirm("Reset everything?")) { totalStars = 0; chHighScore = 0; wordList.forEach(w => w.count = 0); localStorage.setItem('engTotalStars', 0); localStorage.setItem('ss_ch_high', 0); save(); showScreen('home'); } }
+    
+    function resetProgress() { 
+        if(confirm("This will WIPE all custom words, progress, and settings, returning to defaults. Proceed?")) { 
+            localStorage.clear(); 
+            location.reload(); 
+        } 
+    }
 
     // Game Logic
     function renderLearn() { 
@@ -414,18 +455,12 @@
         });
     }
 
-    // CHALLENGE MODE - UPDATED FOR SUMMARY
+    // CHALLENGE MODE
     function startChallenge() {
         const active = getActive();
         if(!active.length) { alert("Enable words in Parent Tools!"); showScreen('home'); return; }
-        
-        chScore = 0; 
-        chCorrectCount = 0; 
-        chWrongCount = 0; 
-        chPracticeWords.clear();
-        chTimeLeft = chTimeLimit; 
-        chTaskType = "match";
-
+        chScore = 0; chCorrectCount = 0; chWrongCount = 0; chPracticeWords.clear();
+        chTimeLeft = chTimeLimit; chTaskType = "match";
         document.getElementById('ch-high').innerText = chHighScore;
         document.getElementById('ch-score').innerText = 0;
         runChTimer();
@@ -458,11 +493,8 @@
             opts.sort(() => 0.5 - Math.random()).forEach(opt => {
                 const b = document.createElement('button'); b.className = 'match-btn'; b.innerText = opt.word;
                 b.onclick = () => { 
-                    if(opt.word === item.word) { 
-                        chScore += 10; chCorrectCount++; chTaskType = "spell"; nextChTask(); 
-                    } else { 
-                        speak("Try again"); chWrongCount++; chPracticeWords.add(item.word);
-                    } 
+                    if(opt.word === item.word) { chScore += 10; chCorrectCount++; chTaskType = "spell"; nextChTask(); } 
+                    else { speak("Try again"); chWrongCount++; chPracticeWords.add(item.word); } 
                     document.getElementById('ch-score').innerText = chScore; 
                 };
                 container.appendChild(b);
@@ -480,9 +512,8 @@
                     const slots = container.querySelectorAll('.slot');
                     if(spellInput.length < slots.length) {
                         slots[spellInput.length].innerText = l; spellInput += l;
-                        if(spellInput === targetWord) { 
-                            chScore += 20; chCorrectCount++; chTaskType = "match"; setTimeout(nextChTask, 600); 
-                        } else if (spellInput.length === targetWord.length) {
+                        if(spellInput === targetWord) { chScore += 20; chCorrectCount++; chTaskType = "match"; setTimeout(nextChTask, 600); } 
+                        else if (spellInput.length === targetWord.length) {
                             speak("Try again"); chWrongCount++; chPracticeWords.add(item.word);
                             setTimeout(() => { spellInput = ""; slots.forEach(s => s.innerText = ""); }, 600);
                         }
@@ -499,17 +530,13 @@
         clearInterval(chInterval);
         confetti({ particleCount: 150 });
         if(chScore > chHighScore) { chHighScore = chScore; localStorage.setItem('ss_ch_high', chHighScore); }
-        
-        // Populate Summary
         document.getElementById('res-score').innerText = chScore;
         document.getElementById('res-correct').innerText = chCorrectCount;
         document.getElementById('res-wrong').innerText = chWrongCount;
-        
         const listDiv = document.getElementById('res-practice-list');
         listDiv.innerHTML = chPracticeWords.size > 0 
             ? Array.from(chPracticeWords).map(w => `<span class="practice-tag">${w}</span>`).join('')
             : '<p style="color:#888;">No mistakes! Perfect run! 🌟</p>';
-            
         document.getElementById('ch-results').style.display = 'flex';
     }
 
@@ -551,4 +578,3 @@
 </script>
 </body>
 </html>
-
